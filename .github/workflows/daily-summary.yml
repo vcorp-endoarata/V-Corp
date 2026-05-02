@@ -1,0 +1,28 @@
+name: Daily Summary
+
+on:
+  schedule:
+    # 0:00 UTC = 09:00 JST 毎日
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  post-summary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run daily summary script
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_USERNAME: V-Corp Bot
+          STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
+        run: |
+          chmod +x scripts/notify.sh scripts/daily-summary.sh
+          ./scripts/daily-summary.sh

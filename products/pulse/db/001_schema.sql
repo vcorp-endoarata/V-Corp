@@ -160,28 +160,26 @@ alter table briefings      enable row level security;
 alter table reports        enable row level security;
 alter table audit_logs     enable row level security;
 
--- 認証済みユーザーは自分のテナントだけを read/write 可
-create policy if not exists "tenant read self" on tenants
-  for select using (
-    id in (select tenant_id from users where id = auth.uid())
-  );
+-- 認証済みユーザーは自分のテナントだけ read/write 可。
+-- Postgres 17 でも `create policy if not exists` は未対応のため、drop → create で冪等化。
+drop policy if exists "tenant read self" on tenants;
+create policy "tenant read self" on tenants
+  for select using (id in (select tenant_id from users where id = auth.uid()));
 
-create policy if not exists "users see own tenant" on users
-  for select using (
-    tenant_id in (select tenant_id from users where id = auth.uid())
-  );
+drop policy if exists "users see own tenant" on users;
+create policy "users see own tenant" on users
+  for select using (tenant_id in (select tenant_id from users where id = auth.uid()));
 
-create policy if not exists "subscriptions read own tenant" on subscriptions
-  for select using (
-    tenant_id in (select tenant_id from users where id = auth.uid())
-  );
+drop policy if exists "subscriptions read own tenant" on subscriptions;
+create policy "subscriptions read own tenant" on subscriptions
+  for select using (tenant_id in (select tenant_id from users where id = auth.uid()));
 
-create policy if not exists "kpi_metrics read own tenant" on kpi_metrics
-  for select using (
-    tenant_id in (select tenant_id from users where id = auth.uid())
-  );
+drop policy if exists "kpi_metrics read own tenant" on kpi_metrics;
+create policy "kpi_metrics read own tenant" on kpi_metrics
+  for select using (tenant_id in (select tenant_id from users where id = auth.uid()));
 
-create policy if not exists "kpi_values read own tenant" on kpi_values
+drop policy if exists "kpi_values read own tenant" on kpi_values;
+create policy "kpi_values read own tenant" on kpi_values
   for select using (
     metric_id in (
       select id from kpi_metrics
@@ -189,12 +187,10 @@ create policy if not exists "kpi_values read own tenant" on kpi_values
     )
   );
 
-create policy if not exists "briefings read own tenant" on briefings
-  for select using (
-    tenant_id in (select tenant_id from users where id = auth.uid())
-  );
+drop policy if exists "briefings read own tenant" on briefings;
+create policy "briefings read own tenant" on briefings
+  for select using (tenant_id in (select tenant_id from users where id = auth.uid()));
 
-create policy if not exists "reports read own tenant" on reports
-  for select using (
-    tenant_id in (select tenant_id from users where id = auth.uid())
-  );
+drop policy if exists "reports read own tenant" on reports;
+create policy "reports read own tenant" on reports
+  for select using (tenant_id in (select tenant_id from users where id = auth.uid()));
