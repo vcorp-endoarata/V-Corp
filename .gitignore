@@ -1,0 +1,22 @@
+# Secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Logs / tmp
+*.log
+tmp/
+.tmp/
+
+# Node / Python venvs (future use)
+node_modules/
+.venv/
+__pycache__/
+*.pyc
