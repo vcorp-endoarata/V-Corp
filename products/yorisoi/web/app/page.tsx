@@ -64,6 +64,9 @@ export default function HomePage() {
           </span>{" "}
           の当事者です。
         </p>
+        <p className="mt-2 text-xs text-sumi/80">
+          開発・運営には家族にも協力してもらっています。
+        </p>
         <p className="mt-4 text-sumi">
           「分かってもらえる場所がない」を、
           <br />
