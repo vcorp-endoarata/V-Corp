@@ -50,6 +50,26 @@ V-Corp/
 - [`CHARTER.md`](./CHARTER.md) — 企業憲章（Vision / Mission / Values）
 - [`ORG_CHART.md`](./ORG_CHART.md) — 組織図と意思決定フロー
 - [`PRINCIPLES.md`](./PRINCIPLES.md) — 経営原則・行動指針
+- [`USER_ACTIONS.md`](./USER_ACTIONS.md) — ユーザー側で必要な手動設定一覧
+
+---
+
+## 事業ポートフォリオ
+
+| プロダクト | ステータス | 説明 |
+| --- | --- | --- |
+| [V-Corp Pulse](./products/pulse/) | 🚧 立ち上げ中 (2026-Q2) | AI 経営判断 SaaS。¥2,980〜¥198,000/月 |
+
+---
+
+## 運用スクリプト
+
+| スクリプト | 用途 |
+| --- | --- |
+| [`scripts/notify.sh`](./scripts/notify.sh) | Discord Webhook 経由の通知投稿 |
+| [`scripts/daily-summary.sh`](./scripts/daily-summary.sh) | 日次の Stripe + Git サマリーを Discord 配信 |
+
+`.env` のひな形は [`.env.example`](./.env.example) を参照。
 
 ---
 

@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground: 245 245 250;
+  --background: 10 10 15;
+}
+
+html, body { background: rgb(var(--background)); color: rgb(var(--foreground)); }
+
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(124,92,255,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124,92,255,0.08) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.glow {
+  box-shadow:
+    0 0 0 1px rgba(124,92,255,0.35),
+    0 20px 80px -10px rgba(124,92,255,0.55);
+}
