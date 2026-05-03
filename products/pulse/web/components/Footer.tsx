@@ -6,7 +6,7 @@ export function Footer() {
         <a href="/legal/terms" className="hover:text-white">利用規約</a>
         <a href="/legal/privacy" className="hover:text-white">プライバシー</a>
         <a href="/legal/tokutei" className="hover:text-white">特定商取引法</a>
-        <a href="mailto:hello@v-corp.io" className="hover:text-white">お問い合わせ</a>
+        <a href="mailto:hello@v-corp.inc" className="hover:text-white">お問い合わせ</a>
       </div>
     </footer>
   );
