@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -77,15 +78,39 @@ export default async function AdminPage() {
     return acc;
   }, {});
 
+  const { count: pendingCrisisCount } = await admin
+    .from("crisis_events")
+    .select("id", { count: "exact", head: true })
+    .eq("reviewed_by_admin", false);
+
   return (
     <div className="space-y-6">
       <header>
         <h1 className="font-display text-2xl text-ink">モデレーション</h1>
         <p className="mt-1 text-xs text-sumi/70">
-          運営者: {profile.nickname} • 通報総数 pending: {counts.pending ?? 0} /
+          運営者: {profile.nickname} • 通報 pending: {counts.pending ?? 0} /
           reviewing: {counts.reviewing ?? 0}
         </p>
       </header>
+
+      <nav className="flex gap-2 text-xs">
+        <Link
+          href="/admin"
+          className="rounded-full bg-sage/20 px-3 py-1.5 text-sage"
+        >
+          📋 通報一覧
+        </Link>
+        <Link
+          href="/admin/crisis"
+          className={`rounded-full px-3 py-1.5 ${
+            (pendingCrisisCount ?? 0) > 0
+              ? "bg-sakura/20 text-sakura"
+              : "border border-wabi text-sumi hover:bg-sage/5"
+          }`}
+        >
+          🌿 危機イベント ({pendingCrisisCount ?? 0})
+        </Link>
+      </nav>
 
       {!reports || reports.length === 0 ? (
         <div className="rounded-2xl border border-wabi bg-white/70 p-10 text-center text-sm text-sumi/70">

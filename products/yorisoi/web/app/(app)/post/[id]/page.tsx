@@ -36,7 +36,7 @@ export default async function PostDetailPage({
     .select(
       `
       id, body, category, space, empathy_count, reply_count, status, created_at,
-      author:profiles!posts_author_id_fkey(id, nickname, role),
+      author:profiles!posts_author_id_fkey(id, nickname, role, show_role),
       media:post_media(id, kind, storage_path, width, height, blurred)
     `,
     )
@@ -68,7 +68,7 @@ export default async function PostDetailPage({
     .select(
       `
       id, body, status, created_at, author_id,
-      author:profiles!replies_author_id_fkey(id, nickname, role)
+      author:profiles!replies_author_id_fkey(id, nickname, role, show_role)
     `,
     )
     .eq("post_id", id)
@@ -126,7 +126,12 @@ export default async function PostDetailPage({
               body: string;
               created_at: string;
               author_id: string;
-              author: { id: string; nickname: string; role: string };
+              author: {
+                id: string;
+                nickname: string;
+                role: string;
+                show_role?: boolean;
+              };
             };
             return (
               <ReplyCard
