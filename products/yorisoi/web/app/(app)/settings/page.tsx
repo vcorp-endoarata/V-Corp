@@ -1,6 +1,9 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { PrivacyForm } from "@/components/PrivacyForm";
+import { NotifyForm } from "@/components/NotifyForm";
+import { AccessibilityForm } from "@/components/AccessibilityForm";
 
 export const metadata = {
   title: "設定 — よりそい",
@@ -16,7 +19,7 @@ export default async function SettingsPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, nickname")
+    .select("id, nickname, show_role, show_prefecture, show_city, show_bio, notify_unazuki, notify_reply, notify_admin_response, notify_email_freq, font_size, reduce_motion, high_contrast")
     .eq("id", user.id)
     .single();
   if (!profile) redirect("/onboarding");
@@ -46,12 +49,75 @@ export default async function SettingsPage() {
         </Link>
       </section>
 
-      {/* 通知設定 (Phase 4 で実装予定) */}
-      <section className="rounded-2xl border border-wabi bg-white/40 p-5 opacity-60">
-        <h2 className="text-sm font-semibold text-ink">通知</h2>
-        <p className="mt-2 text-sm text-sumi">
-          メール通知の設定は後日追加します。
+      {/* プライバシー設定 */}
+      <section className="rounded-2xl border border-wabi bg-white/70 p-5">
+        <h2 className="text-sm font-semibold text-ink">プライバシー</h2>
+        <p className="mt-1 text-xs text-sumi/70">
+          他のユーザーに、あなたの情報をどこまで見せるかを選べます。
+          ニックネームは常に表示されます。
         </p>
+        <div className="mt-4">
+          <PrivacyForm
+            initial={{
+              show_role: profile.show_role,
+              show_prefecture: profile.show_prefecture,
+              show_city: profile.show_city,
+              show_bio: profile.show_bio,
+            }}
+          />
+        </div>
+      </section>
+
+      {/* 緊急時の相談先 */}
+      <section className="rounded-2xl border-2 border-sakura/40 bg-sakura/5 p-5">
+        <h2 className="text-sm font-semibold text-ink">
+          🆘 助けが必要な方へ
+        </h2>
+        <p className="mt-2 text-sm leading-relaxed text-sumi">
+          つらい気持ち・自殺・自傷の衝動を感じたら、
+          ひとりで抱え込まないでください。
+        </p>
+        <Link
+          href="/resources"
+          className="mt-3 inline-block rounded-full bg-sakura/30 px-4 py-1.5 text-sm font-semibold text-ink hover:bg-sakura/50"
+        >
+          24時間つながる相談窓口を見る →
+        </Link>
+      </section>
+
+      {/* 通知設定 */}
+      <section className="rounded-2xl border border-wabi bg-white/70 p-5">
+        <h2 className="text-sm font-semibold text-ink">通知</h2>
+        <p className="mt-1 text-xs text-sumi/70">
+          メールでお知らせする内容と頻度を設定できます。
+        </p>
+        <div className="mt-4">
+          <NotifyForm
+            initial={{
+              notify_unazuki: profile.notify_unazuki,
+              notify_reply: profile.notify_reply,
+              notify_admin_response: profile.notify_admin_response,
+              notify_email_freq: profile.notify_email_freq,
+            }}
+          />
+        </div>
+      </section>
+
+      {/* アクセシビリティ */}
+      <section className="rounded-2xl border border-wabi bg-white/70 p-5">
+        <h2 className="text-sm font-semibold text-ink">アクセシビリティ</h2>
+        <p className="mt-1 text-xs text-sumi/70">
+          見やすさ・使いやすさを調整できます。
+        </p>
+        <div className="mt-4">
+          <AccessibilityForm
+            initial={{
+              font_size: profile.font_size,
+              reduce_motion: profile.reduce_motion,
+              high_contrast: profile.high_contrast,
+            }}
+          />
+        </div>
       </section>
 
       {/* 法務リンク */}

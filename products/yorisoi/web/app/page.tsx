@@ -1,9 +1,44 @@
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 import { WaitlistForm } from "@/components/WaitlistForm";
 
-export default function HomePage() {
+export default async function HomePage() {
+  // ログイン済みなら LP ではなく適切なページへ自動遷移
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("id, ban_until")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (
+      profile?.ban_until &&
+      new Date(profile.ban_until).getTime() > Date.now()
+    ) {
+      redirect("/banned");
+    }
+    if (!profile) {
+      redirect("/onboarding");
+    }
+    redirect("/feed");
+  }
+
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center px-6 py-24 text-center">
-      <span className="rounded-full border border-sage/40 bg-sage/10 px-4 py-1 text-xs tracking-wider text-sage">
+    <main className="relative mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center px-6 py-16 text-center">
+      {/* 右上にログイン導線 */}
+      <Link
+        href="/login"
+        className="absolute right-4 top-4 rounded-full border border-sage/40 bg-white/60 px-4 py-1.5 text-xs font-semibold text-sage hover:bg-sage hover:text-cream md:right-6 md:top-6 md:text-sm"
+      >
+        ログイン
+      </Link>
+
+      <span className="mt-6 rounded-full border border-sage/40 bg-sage/10 px-4 py-1 text-xs tracking-wider text-sage">
         2026年 オープン準備中
       </span>
 
@@ -59,10 +94,7 @@ export default function HomePage() {
         <p className="mt-3 font-semibold text-ink">
           運営者 (遠藤 新大) 自身が、
           <br />
-          <span className="text-sage">
-            ADHD・ASD・トゥレット症候群
-          </span>{" "}
-          の当事者です。
+          <span className="text-sage">ADHD・ASD・トゥレット症候群</span> の当事者です。
         </p>
         <p className="mt-2 text-xs text-sumi/80">
           開発・運営には家族にも協力してもらっています。
@@ -100,9 +132,12 @@ export default function HomePage() {
         </ul>
       </div>
 
-      <div className="mt-16">
+      <div className="mt-16 w-full">
         <p className="mb-4 text-xs text-sumi">
-          オープンしたら、メールでお知らせします。
+          オープン通知を受け取る or{" "}
+          <Link href="/login" className="text-sage underline">
+            既にアカウントをお持ちの方はログイン
+          </Link>
         </p>
         <WaitlistForm />
       </div>
