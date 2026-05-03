@@ -16,8 +16,21 @@ export default {
         wabi: "#EFE7D8",       // ボーダー/区切り: 侘び寂び
       },
       fontFamily: {
-        display: ["'Hiragino Mincho ProN'", "'Yu Mincho'", "serif"],
-        sans: ["'Hiragino Kaku Gothic ProN'", "'Yu Gothic'", "sans-serif"],
+        // Zen Maru Gothic を全文体で使用 (見出し・本文ともに丸ゴシック)
+        // ASD/ADHD 特性: 単一フォント = 認知負荷最小、優しい曲線 = 安心感
+        display: [
+          "var(--font-zen-maru-gothic)",
+          "'Hiragino Maru Gothic ProN'",
+          "'Yu Gothic'",
+          "sans-serif",
+        ],
+        sans: [
+          "var(--font-zen-maru-gothic)",
+          "'Hiragino Maru Gothic ProN'",
+          "'Hiragino Kaku Gothic ProN'",
+          "'Yu Gothic'",
+          "sans-serif",
+        ],
       },
     },
   },
