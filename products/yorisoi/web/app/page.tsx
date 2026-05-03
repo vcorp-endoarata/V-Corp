@@ -23,7 +23,34 @@ export default function HomePage() {
         比較せず、攻撃せず、ただ <strong>寄り添える</strong> 場所を作っています。
       </p>
 
-      <div className="mx-auto mt-12 max-w-md rounded-2xl border border-wabi bg-white/40 p-6 text-left text-sm leading-relaxed text-sumi">
+      {/* 料金 (Stripe 自動審査が「商品/価格あり」と認識できるよう LP 上部に明示) */}
+      <section
+        id="pricing"
+        className="mx-auto mt-12 w-full max-w-md rounded-2xl border-2 border-sage/40 bg-white/60 p-6 text-center"
+      >
+        <p className="text-xs tracking-widest text-sage">料金プラン</p>
+        <p className="mt-2 font-display text-4xl text-ink">
+          月額 <span className="text-sage">¥300</span>
+        </p>
+        <p className="mt-2 text-xs text-sumi/70">
+          税込・14日間の無料トライアル付き
+        </p>
+        <p className="mt-4 text-sm text-sumi">
+          <strong>2026年6月1日 (月) サービス開始予定</strong>
+        </p>
+        <p className="mt-2 text-xs leading-relaxed text-sumi/70">
+          ご契約時から14日間は無料、その後は毎月初に自動課金されます。
+          <br />
+          いつでも解約可能。
+        </p>
+        <p className="mt-4 text-xs">
+          <a href="/legal/tokutei" className="text-sage hover:underline">
+            特定商取引法に基づく表記 →
+          </a>
+        </p>
+      </section>
+
+      <div className="mx-auto mt-8 max-w-md rounded-2xl border border-wabi bg-white/40 p-6 text-left text-sm leading-relaxed text-sumi">
         <p className="font-semibold text-ink">大切にしている設計</p>
         <ul className="mt-3 space-y-2 text-xs">
           <li className="flex gap-2">
