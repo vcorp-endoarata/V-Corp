@@ -3,7 +3,10 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { MediaUploader } from "@/components/MediaUploader";
+import { CrisisCareCard } from "@/components/CrisisCareCard";
 import { uploadFile } from "@/lib/storage";
+
+type CrisisSeverity = "high" | "medium" | "low";
 
 const CATEGORIES = [
   { value: "feeling", label: "🌥 気持ち" },
@@ -30,6 +33,9 @@ export function PostComposer({
   const [files, setFiles] = useState<File[]>([]);
   const [consentConfirmed, setConsentConfirmed] = useState(false);
   const [blurMinors, setBlurMinors] = useState(false);
+  const [crisisSeverity, setCrisisSeverity] = useState<CrisisSeverity | null>(
+    null,
+  );
 
   const hasMedia = files.length > 0;
   const consentMissing = hasMedia && !consentConfirmed;
@@ -87,6 +93,15 @@ export function PostComposer({
         setConsentConfirmed(false);
         setBlurMinors(false);
         router.refresh();
+
+        // 4. 危機検知時はケアカード表示 (low は表示しない、過剰反応防止)
+        if (
+          data.crisis_detected &&
+          (data.crisis_severity === "high" ||
+            data.crisis_severity === "medium")
+        ) {
+          setCrisisSeverity(data.crisis_severity);
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : "エラーが起きました");
       }
@@ -203,6 +218,13 @@ export function PostComposer({
         <p className="mt-2 text-xs text-red-600" role="alert">
           {error}
         </p>
+      )}
+
+      {crisisSeverity && (
+        <CrisisCareCard
+          severity={crisisSeverity}
+          onClose={() => setCrisisSeverity(null)}
+        />
       )}
     </form>
   );

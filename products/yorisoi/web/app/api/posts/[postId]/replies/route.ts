@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { detectCrisis } from "@/lib/crisis-detect";
 
 const Body = z.object({
   body: z.string().trim().min(1).max(500),
@@ -42,6 +44,9 @@ export async function POST(req: Request, { params }: Params) {
     );
   }
 
+  // 危機表現を検知 (返信は隠さず、本人にだけ後で相談先を提示)
+  const crisis = detectCrisis(parsed.data.body);
+
   const { data, error } = await supabase
     .from("replies")
     .insert({
@@ -55,5 +60,26 @@ export async function POST(req: Request, { params }: Params) {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-  return NextResponse.json({ ok: true, reply: data });
+
+  if (crisis.detected) {
+    const admin = createAdminClient();
+    await admin.from("crisis_events").insert({
+      user_id: user.id,
+      post_id: postId,
+      ai_response: {
+        severity: crisis.severity,
+        matched: crisis.matched,
+        kind: "reply",
+        reply_id: data.id,
+      },
+      resources_shown: ["yorisoi_hotline", "inochi_no_denwa", "kokoro_chat"],
+    });
+  }
+
+  return NextResponse.json({
+    ok: true,
+    reply: data,
+    crisis_detected: crisis.detected,
+    crisis_severity: crisis.severity,
+  });
 }
