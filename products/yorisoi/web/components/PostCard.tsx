@@ -32,6 +32,7 @@ type PostCardProps = {
       id: string;
       nickname: string;
       role: string;
+      show_role?: boolean;
     };
     media?: {
       id: string;
@@ -74,9 +75,11 @@ export function PostCard({
       <header className="flex items-center justify-between text-xs text-sumi/70">
         <div className="flex items-center gap-2">
           <span className="font-semibold text-ink">{post.author.nickname}</span>
-          <span className="rounded-full bg-sage/10 px-2 py-0.5 text-sage">
-            {ROLE_LABEL[post.author.role] ?? post.author.role}
-          </span>
+          {post.author.show_role !== false && (
+            <span className="rounded-full bg-sage/10 px-2 py-0.5 text-sage">
+              {ROLE_LABEL[post.author.role] ?? post.author.role}
+            </span>
+          )}
           <span>•</span>
           <span>{CATEGORY_LABEL[post.category] ?? post.category}</span>
         </div>

@@ -32,6 +32,7 @@ type ReplyCardProps = {
       id: string;
       nickname: string;
       role: string;
+      show_role?: boolean;
     };
   };
   isOwn: boolean;
@@ -56,9 +57,11 @@ export function ReplyCard({ reply, isOwn }: ReplyCardProps) {
       <header className="flex items-center justify-between text-xs text-sumi/70">
         <div className="flex items-center gap-2">
           <span className="font-semibold text-ink">{reply.author.nickname}</span>
-          <span className="rounded-full bg-sage/10 px-2 py-0.5 text-sage">
-            {ROLE_LABEL[reply.author.role] ?? reply.author.role}
-          </span>
+          {reply.author.show_role !== false && (
+            <span className="rounded-full bg-sage/10 px-2 py-0.5 text-sage">
+              {ROLE_LABEL[reply.author.role] ?? reply.author.role}
+            </span>
+          )}
         </div>
         <time dateTime={reply.created_at}>{timeAgo(reply.created_at)}</time>
       </header>
