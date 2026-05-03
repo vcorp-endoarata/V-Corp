@@ -1,4 +1,7 @@
+import { CheckoutButton } from "@/components/CheckoutButton";
 import { WaitlistForm } from "@/components/WaitlistForm";
+
+const FOUNDER_LIFETIME_PRICE_ID = "price_1TSewYCwVQEZ2XFqv4afuJc5";
 
 export function Founder() {
   return (
@@ -30,6 +33,21 @@ export function Founder() {
           </li>
         </ul>
         <div className="mt-12">
+          <CheckoutButton
+            priceId={FOUNDER_LIFETIME_PRICE_ID}
+            mode="payment"
+            label="今すぐ Founder Lifetime を購入する"
+            loadingLabel="決済画面に移動中…"
+            className="glow inline-flex items-center justify-center rounded-full bg-accent px-8 py-4 text-base font-semibold text-ink transition hover:opacity-90 disabled:opacity-50"
+          />
+          <p className="mt-3 text-xs text-white/40">
+            Stripe 決済 / 14日以内 全額返金保証 / カード・コンビニ・銀行振込対応
+          </p>
+        </div>
+        <div className="mt-12 border-t border-white/10 pt-10">
+          <p className="mb-4 text-sm text-white/60">
+            まだ検討中の方はウェイトリストへ。ローンチ前にご案内します。
+          </p>
           <WaitlistForm />
         </div>
       </div>
