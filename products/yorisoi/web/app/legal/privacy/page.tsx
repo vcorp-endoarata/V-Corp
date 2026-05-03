@@ -8,7 +8,7 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     title: "1. 事業者情報",
     body: (
       <>
-        本ポリシーにおける「当事業者」とは、屋号 V-Corp (販売事業者: 遠藤 新大、
+        本ポリシーにおける「当事業者」とは、遠藤 新大 (
         所在地: 〒134-0088 東京都江戸川区西葛西3丁目16番20号 ペルシェール西葛西309)
         をいいます。本サービス「よりそい」の運営において、利用者の個人情報を以下のとおり
         適切に取扱います。
@@ -156,7 +156,7 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
             hello@yorisoi.community
           </a>
         </p>
-        <p>事業者: 遠藤 新大 (屋号: V-Corp)</p>
+        <p>事業者: 遠藤 新大</p>
       </div>
     ),
   },
