@@ -18,7 +18,7 @@ export function ReportModal({
   targetId,
   onClose,
 }: {
-  targetType: "post" | "user" | "media";
+  targetType: "post" | "user" | "media" | "reply";
   targetId: string;
   onClose: () => void;
 }) {

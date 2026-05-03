@@ -7,7 +7,7 @@ export function ReportButton({
   targetId,
   disabled = false,
 }: {
-  targetType: "post" | "user" | "media";
+  targetType: "post" | "user" | "media" | "reply";
   targetId: string;
   disabled?: boolean;
 }) {
