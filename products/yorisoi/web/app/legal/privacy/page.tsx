@@ -72,8 +72,7 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
           <li>Stripe Inc. (米国) — クレジットカード決済処理</li>
           <li>Supabase Inc. (米国) — データベース・認証基盤</li>
           <li>Vercel Inc. (米国) — ウェブホスティング</li>
-          <li>Anthropic, PBC (米国) — AI モデレーション処理 (送信データはモデル学習に利用されません)</li>
-          <li>Resend, Inc. (米国) — メール配信 (将来導入予定)</li>
+          <li>Resend, Inc. (米国) — メール配信</li>
         </ul>
       </>
     ),
