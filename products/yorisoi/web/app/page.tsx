@@ -50,7 +50,28 @@ export default function HomePage() {
         </p>
       </section>
 
-      <div className="mx-auto mt-8 max-w-md rounded-2xl border border-wabi bg-white/40 p-6 text-left text-sm leading-relaxed text-sumi">
+      {/* 運営者開示 — founder-market fit を明示 */}
+      <section
+        id="about"
+        className="mx-auto mt-8 max-w-md rounded-2xl border border-sage/30 bg-sage/5 p-6 text-left text-sm leading-relaxed"
+      >
+        <p className="text-xs tracking-widest text-sage">運営者について</p>
+        <p className="mt-3 font-semibold text-ink">
+          運営者 (遠藤 新大) 自身が、
+          <br />
+          <span className="text-sage">
+            ADHD・ASD・トゥレット症候群
+          </span>{" "}
+          の当事者です。
+        </p>
+        <p className="mt-4 text-sumi">
+          「分かってもらえる場所がない」を、
+          <br />
+          当事者として、自分自身のために、作りました。
+        </p>
+      </section>
+
+      <div className="mx-auto mt-6 max-w-md rounded-2xl border border-wabi bg-white/40 p-6 text-left text-sm leading-relaxed text-sumi">
         <p className="font-semibold text-ink">大切にしている設計</p>
         <ul className="mt-3 space-y-2 text-xs">
           <li className="flex gap-2">
