@@ -4,7 +4,7 @@ export const metadata = {
 };
 
 const ROWS: [string, React.ReactNode][] = [
-  ["販売事業者の名称", "遠藤 新大 (屋号: V-Corp)"],
+  ["販売事業者の名称", "遠藤 新大"],
   ["運営責任者", "遠藤 新大"],
   [
     "所在地",

@@ -143,7 +143,7 @@ export default async function HomePage() {
       </div>
 
       <footer className="mt-24 text-xs text-sumi/60">
-        <p>運営: V-Corp / 遠藤 新大</p>
+        <p>運営: 遠藤 新大</p>
         <p className="mt-2 space-x-3">
           <a href="/legal/tokutei" className="hover:text-sage">特定商取引法</a>
           <a href="/legal/terms" className="hover:text-sage">利用規約</a>

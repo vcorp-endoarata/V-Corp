@@ -38,6 +38,5 @@ npm run dev
 
 ## 運営
 
-- 屋号: V-Corp
-- 代表: 遠藤 新大
+- 代表: 遠藤 新大 (個人事業主)
 - お問い合わせ: hello@yorisoi.community
