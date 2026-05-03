@@ -15,14 +15,18 @@ export default async function AppLayout({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, nickname, role")
+    .select("id, nickname, role, is_admin")
     .eq("id", user.id)
     .maybeSingle();
   if (!profile) redirect("/onboarding");
 
   return (
     <div className="min-h-screen">
-      <AppHeader nickname={profile.nickname} role={profile.role} />
+      <AppHeader
+        nickname={profile.nickname}
+        role={profile.role}
+        isAdmin={profile.is_admin}
+      />
       <div className="mx-auto max-w-2xl px-4 pb-24 pt-4 md:pt-8">{children}</div>
     </div>
   );

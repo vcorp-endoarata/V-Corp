@@ -9,9 +9,11 @@ const ROLE_LABEL: Record<string, string> = {
 export function AppHeader({
   nickname,
   role,
+  isAdmin = false,
 }: {
   nickname: string;
   role: string;
+  isAdmin?: boolean;
 }) {
   return (
     <header className="sticky top-0 z-10 border-b border-wabi/60 bg-cream/95 backdrop-blur">
@@ -29,6 +31,16 @@ export function AppHeader({
             </span>
             <span className="hidden md:inline">{nickname}</span>
           </Link>
+          {isAdmin && (
+            <Link
+              href="/admin"
+              aria-label="モデレーション"
+              title="モデレーション"
+              className="text-sumi hover:text-sage"
+            >
+              🛡
+            </Link>
+          )}
           <Link
             href="/settings"
             aria-label="設定"

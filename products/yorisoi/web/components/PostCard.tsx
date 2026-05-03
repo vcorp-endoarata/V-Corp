@@ -1,5 +1,6 @@
 import { UnazukiButton } from "@/components/UnazukiButton";
 import { ShareButton } from "@/components/ShareButton";
+import { ReportButton } from "@/components/ReportButton";
 
 const CATEGORY_LABEL: Record<string, string> = {
   feeling: "🌥 気持ち",
@@ -66,17 +67,20 @@ export function PostCard({ post, hasEmpathy, isOwn }: PostCardProps) {
         {post.body}
       </p>
 
-      <footer className="mt-4 flex items-center gap-1 border-t border-wabi/60 pt-3">
-        <UnazukiButton
-          postId={post.id}
-          initialCount={post.empathy_count}
-          initialActive={hasEmpathy}
-          disabled={isOwn}
-        />
-        <ShareButton
-          text={post.body.slice(0, 80) + (post.body.length > 80 ? "…" : "")}
-          url={`https://yorisoi.community/post/${post.id}`}
-        />
+      <footer className="mt-4 flex items-center justify-between gap-1 border-t border-wabi/60 pt-3">
+        <div className="flex items-center gap-1">
+          <UnazukiButton
+            postId={post.id}
+            initialCount={post.empathy_count}
+            initialActive={hasEmpathy}
+            disabled={isOwn}
+          />
+          <ShareButton
+            text={post.body.slice(0, 80) + (post.body.length > 80 ? "…" : "")}
+            url={`https://yorisoi.community/post/${post.id}`}
+          />
+        </div>
+        <ReportButton targetType="post" targetId={post.id} disabled={isOwn} />
       </footer>
     </article>
   );
