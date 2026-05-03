@@ -31,6 +31,14 @@ export function AppHeader({
             </span>
             <span className="hidden md:inline">{nickname}</span>
           </Link>
+          <Link
+            href="/resources"
+            aria-label="助けが必要な方へ"
+            title="助けが必要な方へ"
+            className="text-sumi hover:text-sakura"
+          >
+            🆘
+          </Link>
           {isAdmin && (
             <Link
               href="/admin"
