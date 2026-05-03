@@ -45,8 +45,9 @@ export default async function FeedPage({
     .from("posts")
     .select(
       `
-      id, body, category, space, empathy_count, created_at,
-      author:profiles!posts_author_id_fkey(id, nickname, role)
+      id, body, category, space, empathy_count, reply_count, created_at,
+      author:profiles!posts_author_id_fkey(id, nickname, role),
+      media:post_media(id, kind, storage_path, width, height, blurred)
     `,
     )
     .eq("space", space)

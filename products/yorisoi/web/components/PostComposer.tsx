@@ -1,6 +1,9 @@
 "use client";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { MediaUploader } from "@/components/MediaUploader";
+import { uploadFile } from "@/lib/storage";
 
 const CATEGORIES = [
   { value: "feeling", label: "🌥 気持ち" },
@@ -24,22 +27,65 @@ export function PostComposer({
   const [category, setCategory] = useState<typeof CATEGORIES[number]["value"]>("diary");
   const [space, setSpace] = useState<"self" | "family" | "shared">(defaultSpace);
   const [error, setError] = useState<string | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
+  const [consentConfirmed, setConsentConfirmed] = useState(false);
+  const [blurMinors, setBlurMinors] = useState(false);
+
+  const hasMedia = files.length > 0;
+  const consentMissing = hasMedia && !consentConfirmed;
+  const noContent = body.trim().length === 0 && !hasMedia;
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!body.trim()) return;
+    if (noContent || consentMissing) return;
 
     startTransition(async () => {
       setError(null);
       try {
+        // 1. Post を作成
         const res = await fetch("/api/posts", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ body: body.trim(), category, space }),
+          body: JSON.stringify({
+            body: body.trim() || "(写真・動画の投稿)",
+            category,
+            space,
+          }),
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error ?? "投稿できませんでした");
+
+        // 2. Media をアップロード
+        if (hasMedia && data.id) {
+          const supabase = createClient();
+          const {
+            data: { user },
+          } = await supabase.auth.getUser();
+          if (!user) throw new Error("認証が切れました");
+
+          for (const file of files) {
+            const meta = await uploadFile(supabase, user.id, data.id, file);
+            const { error: insertError } = await supabase
+              .from("post_media")
+              .insert({
+                post_id: data.id,
+                kind: meta.kind,
+                storage_path: meta.storage_path,
+                width: meta.width ?? null,
+                height: meta.height ?? null,
+                bytes: meta.bytes,
+                blurred: blurMinors,
+                consent_confirmed: true,
+              });
+            if (insertError) throw insertError;
+          }
+        }
+
+        // 3. リセット + リフレッシュ
         setBody("");
+        setFiles([]);
+        setConsentConfirmed(false);
+        setBlurMinors(false);
         router.refresh();
       } catch (err) {
         setError(err instanceof Error ? err.message : "エラーが起きました");
@@ -63,6 +109,45 @@ export function PostComposer({
         className="w-full resize-none rounded-xl border border-transparent bg-transparent p-2 text-base text-ink outline-none placeholder:text-ink/40 focus:border-sage/40"
         aria-label="投稿本文"
       />
+
+      <div className="mt-3 border-t border-wabi/60 pt-3">
+        <MediaUploader
+          files={files}
+          onFilesChange={setFiles}
+          disabled={isPending}
+        />
+      </div>
+
+      {hasMedia && (
+        <div className="mt-3 space-y-2 rounded-xl bg-sage/5 p-3">
+          <label className="flex items-start gap-2 text-xs text-sumi">
+            <input
+              type="checkbox"
+              checked={consentConfirmed}
+              onChange={(e) => setConsentConfirmed(e.target.checked)}
+              className="mt-0.5 accent-sage"
+            />
+            <span>
+              <strong className="text-ink">写っている人全員の同意を得ました</strong>
+              <br />
+              本人の同意がない投稿は削除・通報の対象になります。
+            </span>
+          </label>
+
+          <label className="flex items-start gap-2 text-xs text-sumi">
+            <input
+              type="checkbox"
+              checked={blurMinors}
+              onChange={(e) => setBlurMinors(e.target.checked)}
+              className="mt-0.5 accent-sage"
+            />
+            <span>
+              未成年が写っているので <strong>ぼかし表示</strong> にする
+              <span className="text-sumi/60"> (推奨)</span>
+            </span>
+          </label>
+        </div>
+      )}
 
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-wabi/60 pt-3">
         <div className="flex flex-wrap gap-2">
@@ -101,7 +186,12 @@ export function PostComposer({
           <span className="text-xs text-sumi/50">{body.length} / 500</span>
           <button
             type="submit"
-            disabled={!body.trim() || isPending}
+            disabled={noContent || consentMissing || isPending}
+            title={
+              consentMissing
+                ? "写真・動画を投稿するには同意確認が必要です"
+                : undefined
+            }
             className="rounded-full bg-sage px-5 py-1.5 text-sm font-semibold text-cream transition hover:opacity-90 disabled:opacity-40"
           >
             {isPending ? "送信中…" : "投稿"}

@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { UnazukiButton } from "@/components/UnazukiButton";
 import { ShareButton } from "@/components/ShareButton";
 import { ReportButton } from "@/components/ReportButton";
+import { PostMediaDisplay } from "@/components/PostMediaDisplay";
 
 const CATEGORY_LABEL: Record<string, string> = {
   feeling: "🌥 気持ち",
@@ -24,15 +26,26 @@ type PostCardProps = {
     category: string;
     space: string;
     empathy_count: number;
+    reply_count?: number;
     created_at: string;
     author: {
       id: string;
       nickname: string;
       role: string;
     };
+    media?: {
+      id: string;
+      kind: "image" | "video";
+      storage_path: string;
+      width?: number | null;
+      height?: number | null;
+      blurred?: boolean | null;
+    }[];
   };
   hasEmpathy: boolean;
   isOwn: boolean;
+  /** 詳細ページ表示時など返信リンクを出さない時 */
+  hideReplyLink?: boolean;
 };
 
 function timeAgo(iso: string): string {
@@ -48,7 +61,14 @@ function timeAgo(iso: string): string {
   return `${mo}ヶ月前`;
 }
 
-export function PostCard({ post, hasEmpathy, isOwn }: PostCardProps) {
+export function PostCard({
+  post,
+  hasEmpathy,
+  isOwn,
+  hideReplyLink = false,
+}: PostCardProps) {
+  const replyCount = post.reply_count ?? 0;
+
   return (
     <article className="rounded-2xl border border-wabi bg-white/70 p-5">
       <header className="flex items-center justify-between text-xs text-sumi/70">
@@ -67,6 +87,10 @@ export function PostCard({ post, hasEmpathy, isOwn }: PostCardProps) {
         {post.body}
       </p>
 
+      {post.media && post.media.length > 0 && (
+        <PostMediaDisplay media={post.media} />
+      )}
+
       <footer className="mt-4 flex items-center justify-between gap-1 border-t border-wabi/60 pt-3">
         <div className="flex items-center gap-1">
           <UnazukiButton
@@ -75,6 +99,16 @@ export function PostCard({ post, hasEmpathy, isOwn }: PostCardProps) {
             initialActive={hasEmpathy}
             disabled={isOwn}
           />
+          {!hideReplyLink && (
+            <Link
+              href={`/post/${post.id}`}
+              className="flex items-center gap-1 rounded-full px-3 py-1.5 text-xs text-sumi/60 transition hover:bg-sage/10 hover:text-sage"
+              aria-label={`返信を見る (${replyCount}件)`}
+            >
+              <span aria-hidden>💬</span>
+              <span>{replyCount > 0 ? `返信 ${replyCount}` : "返信する"}</span>
+            </Link>
+          )}
           <ShareButton
             text={post.body.slice(0, 80) + (post.body.length > 80 ? "…" : "")}
             url={`https://yorisoi.community/post/${post.id}`}
