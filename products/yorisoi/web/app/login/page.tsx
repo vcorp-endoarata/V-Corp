@@ -1,23 +1,45 @@
 import { Suspense } from "react";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 import { LoginForm } from "@/components/LoginForm";
 
 export const metadata = {
-  title: "ログイン — よりそい",
+  title: "はじめる / ログイン — よりそい",
   robots: { index: false, follow: false },
 };
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  // 既ログイン済みなら適切なページへ
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("id", user.id)
+      .maybeSingle();
+    redirect(profile ? "/feed" : "/onboarding");
+  }
+
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-16">
       <a href="/" className="text-sm text-sumi/60 hover:text-sage">
         ← よりそい
       </a>
 
-      <h1 className="mt-8 font-display text-4xl text-ink">ログイン</h1>
+      <h1 className="mt-8 font-display text-4xl text-ink">はじめる / ログイン</h1>
       <p className="mt-3 text-sm leading-relaxed text-sumi">
-        メールアドレスを入力すると、ログインリンクをお送りします。
+        メールアドレスを入力すると、リンクを送ります。
         <br />
-        パスワードは不要です。
+        <strong>はじめての方</strong>はリンクをタップで自動で
+        アカウント作成、<strong>既にアカウントがある方</strong>は
+        そのままログインできます。
+      </p>
+      <p className="mt-3 rounded-xl bg-sage/5 px-4 py-2 text-xs leading-relaxed text-sumi/80">
+        パスワードはありません。毎回メールでログインリンクをお送りする方式です。
+        覚える必要が無く、ハッキングされにくい仕組みです。
       </p>
 
       <Suspense
@@ -29,7 +51,7 @@ export default function LoginPage() {
       </Suspense>
 
       <p className="mt-12 text-center text-xs leading-relaxed text-sumi/60">
-        ログインすることで、
+        続行することで、
         <a href="/legal/terms" className="text-sage underline">利用規約</a>
         と
         <a href="/legal/privacy" className="text-sage underline">プライバシーポリシー</a>

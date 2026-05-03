@@ -41,14 +41,28 @@ export function LoginForm() {
         className="mt-12 rounded-2xl border border-sage/40 bg-sage/5 p-6 text-sm leading-relaxed text-ink"
         role="status"
       >
-        <p className="font-semibold text-sage">メールを送信しました</p>
+        <p className="font-semibold text-sage">メールを送信しました ✉</p>
         <p className="mt-3">
-          <strong>{email}</strong> 宛にログインリンクを送りました。
-          メールを開いて、リンクをクリックしてください。
+          <strong>{email}</strong> 宛にリンクを送りました。
+          <br />
+          メールを開いて、リンクをタップしてください。
         </p>
         <p className="mt-3 text-xs text-sumi/70">
-          メールが届かない場合は、迷惑メールフォルダもご確認ください。
+          • はじめての方は、リンクをタップでアカウント作成が完了します
+          <br />
+          • 既存ユーザーはそのままログインされます
+          <br />
+          • メールが届かない場合は迷惑メールフォルダもご確認ください
+          <br />
+          • リンクは <strong>1時間以内</strong> に <strong>1回だけ</strong> 有効です
         </p>
+        <button
+          type="button"
+          onClick={() => setState("idle")}
+          className="mt-4 text-xs text-sage underline"
+        >
+          別のメールアドレスで送り直す
+        </button>
       </div>
     );
   }
@@ -75,7 +89,7 @@ export function LoginForm() {
         disabled={state === "sending" || !email}
         className="w-full rounded-2xl bg-sage px-6 py-3 text-base font-semibold text-cream transition hover:opacity-90 disabled:opacity-50"
       >
-        {state === "sending" ? "送信中…" : "ログインリンクを受け取る"}
+        {state === "sending" ? "送信中…" : "メールでリンクを受け取る"}
       </button>
 
       {error && (

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { PrivacyForm } from "@/components/PrivacyForm";
 
 export const metadata = {
   title: "設定 — よりそい",
@@ -16,7 +17,9 @@ export default async function SettingsPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, nickname")
+    .select(
+      "id, nickname, show_role, show_prefecture, show_city, show_bio",
+    )
     .eq("id", user.id)
     .single();
   if (!profile) redirect("/onboarding");
@@ -44,6 +47,25 @@ export default async function SettingsPage() {
         >
           プロフィールを編集
         </Link>
+      </section>
+
+      {/* プライバシー設定 */}
+      <section className="rounded-2xl border border-wabi bg-white/70 p-5">
+        <h2 className="text-sm font-semibold text-ink">プライバシー</h2>
+        <p className="mt-1 text-xs text-sumi/70">
+          他のユーザーに、あなたの情報をどこまで見せるかを選べます。
+          ニックネームは常に表示されます。
+        </p>
+        <div className="mt-4">
+          <PrivacyForm
+            initial={{
+              show_role: profile.show_role,
+              show_prefecture: profile.show_prefecture,
+              show_city: profile.show_city,
+              show_bio: profile.show_bio,
+            }}
+          />
+        </div>
       </section>
 
       {/* 通知設定 (Phase 4 で実装予定) */}
