@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "V-Corp Pulse — 経営判断を、AI で 10倍速く。",
   description:
     "毎朝3分。AI が世界の動きと自社の数字を読み解き、今日の経営判断に必要な3つのアクションを提示する SaaS。",
-  metadataBase: new URL("https://pulse.v-corp.io"),
+  metadataBase: new URL("https://v-corp.inc"),
   openGraph: {
     title: "V-Corp Pulse",
     description: "経営判断を、AI で 10倍速く、10倍正確に。",
