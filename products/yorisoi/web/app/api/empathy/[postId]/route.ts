@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { enqueueUnazukiNotification } from "@/lib/notifications";
 
 type Params = { params: Promise<{ postId: string }> };
 
@@ -37,6 +38,16 @@ export async function POST(_req: Request, { params }: Params) {
   if (error && error.code !== "23505") {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+
+  // 既存うなずきの toggle 再追加 (23505) ではない、本当の新規うなずきだけ通知
+  if (!error) {
+    await enqueueUnazukiNotification({
+      recipientId: post.author_id,
+      actorId: user.id,
+      postId,
+    });
+  }
+
   return NextResponse.json({ ok: true });
 }
 

@@ -74,7 +74,12 @@ export function PostCard({
     <article className="rounded-2xl border border-wabi bg-white/70 p-5">
       <header className="flex items-center justify-between text-xs text-sumi/70">
         <div className="flex items-center gap-2">
-          <span className="font-semibold text-ink">{post.author.nickname}</span>
+          <Link
+            href={`/user/${post.author.id}`}
+            className="font-semibold text-ink hover:text-sage hover:underline"
+          >
+            {post.author.nickname}
+          </Link>
           {post.author.show_role !== false && (
             <span className="rounded-full bg-sage/10 px-2 py-0.5 text-sage">
               {ROLE_LABEL[post.author.role] ?? post.author.role}

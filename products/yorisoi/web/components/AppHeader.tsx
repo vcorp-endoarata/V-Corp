@@ -10,10 +10,12 @@ export function AppHeader({
   nickname,
   role,
   isAdmin = false,
+  unreadNotifications = 0,
 }: {
   nickname: string;
   role: string;
   isAdmin?: boolean;
+  unreadNotifications?: number;
 }) {
   return (
     <header className="sticky top-0 z-10 border-b border-wabi/60 bg-cream/95 backdrop-blur">
@@ -30,6 +32,23 @@ export function AppHeader({
               {ROLE_LABEL[role] ?? role}
             </span>
             <span className="hidden md:inline">{nickname}</span>
+          </Link>
+          <Link
+            href="/notifications"
+            aria-label={
+              unreadNotifications > 0
+                ? `通知 (${unreadNotifications}件未読)`
+                : "通知"
+            }
+            title="通知"
+            className="relative text-sumi hover:text-sage"
+          >
+            <span aria-hidden>🔔</span>
+            {unreadNotifications > 0 && (
+              <span className="absolute -right-2 -top-1 min-w-[18px] rounded-full bg-sakura px-1 text-center text-[10px] font-semibold text-cream">
+                {unreadNotifications > 99 ? "99+" : unreadNotifications}
+              </span>
+            )}
           </Link>
           <Link
             href="/resources"
