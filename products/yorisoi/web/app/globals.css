@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  background-color: #FAF6EE;
+}
+
+body {
+  font-feature-settings: "palt";
+}
+
+/* やわらかいスクロール挙動 */
+html {
+  scroll-behavior: smooth;
+}
+
+/* フォーカスリング: 角ばらず柔らかく */
+*:focus-visible {
+  outline: 2px solid #7A9C86;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
