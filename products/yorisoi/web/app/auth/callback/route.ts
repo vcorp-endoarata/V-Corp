@@ -18,6 +18,19 @@ export async function GET(request: NextRequest) {
   const next = url.searchParams.get("next") ?? "/feed";
   const origin = url.origin;
 
+  // Supabase が error を URL params で返すケース (期限切れ等)
+  const errorCode = url.searchParams.get("error_code");
+  const errorDescription = url.searchParams.get("error_description");
+  if (errorCode) {
+    const msg =
+      errorCode === "otp_expired"
+        ? "ログインリンクの有効期限が切れています。もう一度お送りします。"
+        : (errorDescription ?? errorCode);
+    return NextResponse.redirect(
+      `${origin}/login?error=${encodeURIComponent(msg)}`,
+    );
+  }
+
   const supabase = await createClient();
 
   if (code) {
