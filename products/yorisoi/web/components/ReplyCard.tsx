@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ReportButton } from "@/components/ReportButton";
@@ -56,7 +57,12 @@ export function ReplyCard({ reply, isOwn }: ReplyCardProps) {
     <article className="rounded-2xl border border-wabi/60 bg-white/50 p-4">
       <header className="flex items-center justify-between text-xs text-sumi/70">
         <div className="flex items-center gap-2">
-          <span className="font-semibold text-ink">{reply.author.nickname}</span>
+          <Link
+            href={`/user/${reply.author.id}`}
+            className="font-semibold text-ink hover:text-sage hover:underline"
+          >
+            {reply.author.nickname}
+          </Link>
           {reply.author.show_role !== false && (
             <span className="rounded-full bg-sage/10 px-2 py-0.5 text-sage">
               {ROLE_LABEL[reply.author.role] ?? reply.author.role}

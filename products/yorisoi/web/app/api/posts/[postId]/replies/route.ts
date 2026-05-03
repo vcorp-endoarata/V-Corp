@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { detectCrisis } from "@/lib/crisis-detect";
+import { enqueueReplyNotification } from "@/lib/notifications";
 
 const Body = z.object({
   body: z.string().trim().min(1).max(500),
@@ -31,7 +32,7 @@ export async function POST(req: Request, { params }: Params) {
 
   const { data: post } = await supabase
     .from("posts")
-    .select("id, status")
+    .select("id, status, author_id")
     .eq("id", postId)
     .maybeSingle();
   if (!post) {
@@ -75,6 +76,15 @@ export async function POST(req: Request, { params }: Params) {
       resources_shown: ["yorisoi_hotline", "inochi_no_denwa", "kokoro_chat"],
     });
   }
+
+  // 投稿の作者に通知 (自分の投稿への自分の返信は enqueue 内でスキップ)
+  await enqueueReplyNotification({
+    recipientId: post.author_id,
+    actorId: user.id,
+    postId,
+    replyId: data.id,
+    replyBody: parsed.data.body,
+  });
 
   return NextResponse.json({
     ok: true,
