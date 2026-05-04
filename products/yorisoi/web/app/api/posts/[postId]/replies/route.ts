@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { detectCrisis } from "@/lib/crisis-detect";
 import { enqueueReplyNotification } from "@/lib/notifications";
 
 const Body = z.object({
@@ -45,9 +43,6 @@ export async function POST(req: Request, { params }: Params) {
     );
   }
 
-  // 危機表現を検知 (返信は隠さず、本人にだけ後で相談先を提示)
-  const crisis = detectCrisis(parsed.data.body);
-
   const { data, error } = await supabase
     .from("replies")
     .insert({
@@ -62,21 +57,6 @@ export async function POST(req: Request, { params }: Params) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  if (crisis.detected) {
-    const admin = createAdminClient();
-    await admin.from("crisis_events").insert({
-      user_id: user.id,
-      post_id: postId,
-      ai_response: {
-        severity: crisis.severity,
-        matched: crisis.matched,
-        kind: "reply",
-        reply_id: data.id,
-      },
-      resources_shown: ["yorisoi_hotline", "inochi_no_denwa", "kokoro_chat"],
-    });
-  }
-
   // 投稿の作者に通知 (自分の投稿への自分の返信は enqueue 内でスキップ)
   await enqueueReplyNotification({
     recipientId: post.author_id,
@@ -86,10 +66,5 @@ export async function POST(req: Request, { params }: Params) {
     replyBody: parsed.data.body,
   });
 
-  return NextResponse.json({
-    ok: true,
-    reply: data,
-    crisis_detected: crisis.detected,
-    crisis_severity: crisis.severity,
-  });
+  return NextResponse.json({ ok: true, reply: data });
 }
