@@ -5,6 +5,7 @@ import { PrivacyForm } from "@/components/PrivacyForm";
 import { NotifyForm } from "@/components/NotifyForm";
 import { AccessibilityForm } from "@/components/AccessibilityForm";
 import { SubscribeButton } from "@/components/SubscribeButton";
+import { isBetaPeriod } from "@/lib/access";
 
 export const metadata = {
   title: "設定 — よりそい",
@@ -56,10 +57,18 @@ export default async function SettingsPage({
   const isActive =
     subscription?.status &&
     ["trialing", "active"].includes(subscription.status);
+  const inBeta = isBetaPeriod();
 
   return (
     <div className="space-y-6">
       <h1 className="font-display text-2xl text-ink">設定</h1>
+
+      {inBeta && (
+        <div className="rounded-2xl border border-sage/40 bg-sage/5 p-4 text-sm text-ink">
+          🌱 <strong>ベータ期間中</strong>: 全機能を無料でお使いいただけます。<br />
+          応援したい方は、サブスクリプション登録もお気軽にどうぞ。
+        </div>
+      )}
 
       {/* Checkout 戻り通知 */}
       {params.subscription === "success" && (
@@ -172,23 +181,6 @@ export default async function SettingsPage({
             }}
           />
         </div>
-      </section>
-
-      {/* 緊急時の相談先 */}
-      <section className="rounded-2xl border-2 border-sakura/40 bg-sakura/5 p-5">
-        <h2 className="text-sm font-semibold text-ink">
-          🆘 助けが必要な方へ
-        </h2>
-        <p className="mt-2 text-sm leading-relaxed text-sumi">
-          つらい気持ち・自殺・自傷の衝動を感じたら、
-          ひとりで抱え込まないでください。
-        </p>
-        <Link
-          href="/resources"
-          className="mt-3 inline-block rounded-full bg-sakura/30 px-4 py-1.5 text-sm font-semibold text-ink hover:bg-sakura/50"
-        >
-          24時間つながる相談窓口を見る →
-        </Link>
       </section>
 
       {/* 通知設定 */}
