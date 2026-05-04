@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { PostCard } from "@/components/PostCard";
+import { RelationMenu } from "@/components/RelationMenu";
 
 export const metadata = {
   title: "プロフィール — よりそい",
@@ -55,6 +56,15 @@ export default async function PublicProfilePage({
     .eq("user_id", user.id);
   const empathySet = new Set((myEmpathy ?? []).map((e) => e.post_id));
 
+  // 自分が この人を block/mute してるか
+  const { data: relations } = await supabase
+    .from("user_relations")
+    .select("kind")
+    .eq("user_id", user.id)
+    .eq("target_id", id);
+  const blocked = (relations ?? []).some((r) => r.kind === "block");
+  const muted = (relations ?? []).some((r) => r.kind === "mute");
+
   // この人の publishedな投稿 (RLS で空間アクセス制御)
   const { data: posts } = await supabase
     .from("posts")
@@ -80,13 +90,30 @@ export default async function PublicProfilePage({
       </Link>
 
       <header className="rounded-2xl border border-wabi bg-white/70 p-6">
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="font-display text-2xl text-ink">{target.nickname}</h1>
-          {showRole && (
-            <span className="rounded-full bg-sage/10 px-3 py-1 text-xs text-sage">
-              {ROLE_LABEL[target.role] ?? target.role}
-            </span>
-          )}
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="font-display text-2xl text-ink">{target.nickname}</h1>
+            {showRole && (
+              <span className="rounded-full bg-sage/10 px-3 py-1 text-xs text-sage">
+                {ROLE_LABEL[target.role] ?? target.role}
+              </span>
+            )}
+            {blocked && (
+              <span className="rounded-full bg-sumi/10 px-3 py-1 text-xs text-sumi">
+                ブロック中
+              </span>
+            )}
+            {muted && (
+              <span className="rounded-full bg-sumi/10 px-3 py-1 text-xs text-sumi">
+                ミュート中
+              </span>
+            )}
+          </div>
+          <RelationMenu
+            targetUserId={target.id}
+            initialBlocked={blocked}
+            initialMuted={muted}
+          />
         </div>
 
         {(showPrefecture || showCity) && (
