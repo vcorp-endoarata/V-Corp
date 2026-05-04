@@ -4,13 +4,35 @@ import { createClient } from "@/lib/supabase/server";
 import { PrivacyForm } from "@/components/PrivacyForm";
 import { NotifyForm } from "@/components/NotifyForm";
 import { AccessibilityForm } from "@/components/AccessibilityForm";
+import { SubscribeButton } from "@/components/SubscribeButton";
 
 export const metadata = {
   title: "設定 — よりそい",
   robots: { index: false, follow: false },
 };
 
-export default async function SettingsPage() {
+const SUB_STATUS_LABEL: Record<string, { label: string; tone: string }> = {
+  trialing: { label: "🌱 無料トライアル中", tone: "bg-sage/10 text-sage" },
+  active: { label: "✅ 有効", tone: "bg-sage/10 text-sage" },
+  past_due: { label: "⚠️ 支払い遅延", tone: "bg-sakura/10 text-sakura" },
+  canceled: { label: "解約済み", tone: "bg-sumi/10 text-sumi" },
+  incomplete: { label: "登録未完了", tone: "bg-sumi/10 text-sumi" },
+};
+
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("ja-JP", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+export default async function SettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ subscription?: string }>;
+}) {
+  const params = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -24,9 +46,93 @@ export default async function SettingsPage() {
     .single();
   if (!profile) redirect("/onboarding");
 
+  // 自分の subscription 状況 (RLS で本人のみ取得)
+  const { data: subscription } = await supabase
+    .from("subscriptions")
+    .select("status, trial_end, current_period_end, cancel_at_period_end")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  const isActive =
+    subscription?.status &&
+    ["trialing", "active"].includes(subscription.status);
+
   return (
     <div className="space-y-6">
       <h1 className="font-display text-2xl text-ink">設定</h1>
+
+      {/* Checkout 戻り通知 */}
+      {params.subscription === "success" && (
+        <div
+          role="status"
+          className="rounded-2xl border border-sage/40 bg-sage/5 p-4 text-sm text-ink"
+        >
+          🌿 サブスクの登録ありがとうございます。14日間の無料トライアルが始まりました。
+        </div>
+      )}
+      {params.subscription === "cancelled" && (
+        <div
+          className="rounded-2xl border border-wabi bg-white/70 p-4 text-sm text-sumi"
+        >
+          サブスク登録をキャンセルしました。いつでもまた始められます。
+        </div>
+      )}
+
+      {/* サブスクリプション */}
+      <section className="rounded-2xl border border-wabi bg-white/70 p-5">
+        <h2 className="text-sm font-semibold text-ink">サブスクリプション</h2>
+
+        {subscription ? (
+          <div className="mt-3 space-y-2 text-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-sumi">ステータス</span>
+              <span
+                className={`rounded-full px-3 py-1 text-xs ${
+                  SUB_STATUS_LABEL[subscription.status]?.tone ?? "bg-sumi/10 text-sumi"
+                }`}
+              >
+                {SUB_STATUS_LABEL[subscription.status]?.label ??
+                  subscription.status}
+              </span>
+            </div>
+            {subscription.trial_end &&
+              subscription.status === "trialing" && (
+                <div className="flex justify-between text-sumi">
+                  <span>無料期間終了</span>
+                  <span className="text-ink">
+                    {formatDate(subscription.trial_end)}
+                  </span>
+                </div>
+              )}
+            {subscription.current_period_end && (
+              <div className="flex justify-between text-sumi">
+                <span>次回更新日</span>
+                <span className="text-ink">
+                  {formatDate(subscription.current_period_end)}
+                </span>
+              </div>
+            )}
+            {subscription.cancel_at_period_end && (
+              <p className="rounded-xl bg-sakura/5 p-2 text-xs text-sumi">
+                次回更新日に解約されます。
+              </p>
+            )}
+            {!isActive && (
+              <div className="mt-4">
+                <SubscribeButton />
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="mt-3 space-y-3">
+            <p className="text-sm leading-relaxed text-sumi">
+              よりそい は月額 ¥300 の安価な利用料で運営されています。<br />
+              14日間の無料トライアルから始められます。
+            </p>
+            <SubscribeButton />
+          </div>
+        )}
+      </section>
 
       {/* アカウント情報 */}
       <section className="rounded-2xl border border-wabi bg-white/70 p-5">
