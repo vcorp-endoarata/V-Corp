@@ -36,7 +36,7 @@ export default async function SearchPage({
         .select(
           `
           id, body, category, space, empathy_count, reply_count, created_at,
-          author:profiles!posts_author_id_fkey(id, nickname, role, show_role),
+          author:profiles!posts_author_id_fkey(id, nickname, role, show_role, avatar_url),
           media:post_media(id, kind, storage_path, width, height, blurred)
         `,
         )
