@@ -84,7 +84,7 @@ export function PrivacyForm({ initial }: { initial: Privacy }) {
                   role="status"
                   aria-live="polite"
                 >
-                  保存
+                  ✓ 保存しました
                 </span>
               )}
               <input

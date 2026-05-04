@@ -80,7 +80,7 @@ export function NotifyForm({ initial }: { initial: Notify }) {
             <span className="flex shrink-0 items-center gap-2 pt-0.5">
               {savedKey === key && (
                 <span className="text-xs text-sage" role="status">
-                  保存
+                  ✓ 保存しました
                 </span>
               )}
               <input
@@ -123,7 +123,7 @@ export function NotifyForm({ initial }: { initial: Notify }) {
             </select>
             {savedKey === "notify_email_freq" && (
               <span className="text-xs text-sage" role="status">
-                保存
+                ✓ 保存しました
               </span>
             )}
           </div>
