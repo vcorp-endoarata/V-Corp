@@ -3,6 +3,8 @@ import { UnazukiButton } from "@/components/UnazukiButton";
 import { ShareButton } from "@/components/ShareButton";
 import { ReportButton } from "@/components/ReportButton";
 import { BookmarkButton } from "@/components/BookmarkButton";
+import { PinButton } from "@/components/PinButton";
+import { Avatar } from "@/components/Avatar";
 import { PostMediaDisplay } from "@/components/PostMediaDisplay";
 import { renderBodyWithTags } from "@/lib/hashtags";
 
@@ -35,6 +37,7 @@ type PostCardProps = {
       nickname: string;
       role: string;
       show_role?: boolean;
+      avatar_url?: string | null;
     };
     media?: {
       id: string;
@@ -48,6 +51,9 @@ type PostCardProps = {
   hasEmpathy: boolean;
   isOwn: boolean;
   hasBookmark?: boolean;
+  isPinned?: boolean;
+  showPinControl?: boolean;
+  pinnedBadge?: boolean;
   /** 詳細ページ表示時など返信リンクを出さない時 */
   hideReplyLink?: boolean;
 };
@@ -70,14 +76,29 @@ export function PostCard({
   hasEmpathy,
   isOwn,
   hasBookmark = false,
+  isPinned = false,
+  showPinControl = false,
+  pinnedBadge = false,
   hideReplyLink = false,
 }: PostCardProps) {
   const replyCount = post.reply_count ?? 0;
 
   return (
     <article className="rounded-2xl border border-wabi bg-white/70 p-5">
+      {pinnedBadge && (
+        <div className="mb-2 flex items-center gap-1 text-xs text-sage">
+          <span aria-hidden>📌</span>
+          <span>ピン留めされた投稿</span>
+        </div>
+      )}
       <header className="flex items-center justify-between text-xs text-sumi/70">
         <div className="flex items-center gap-2">
+          <Avatar
+            url={post.author.avatar_url}
+            nickname={post.author.nickname}
+            size="sm"
+            href={`/user/${post.author.id}`}
+          />
           <Link
             href={`/user/${post.author.id}`}
             className="font-semibold text-ink hover:text-sage hover:underline"
@@ -126,6 +147,9 @@ export function PostCard({
             url={`https://yorisoi.community/post/${post.id}`}
           />
           <BookmarkButton postId={post.id} initialActive={hasBookmark} />
+          {showPinControl && isOwn && (
+            <PinButton postId={post.id} initialPinned={isPinned} />
+          )}
         </div>
         <ReportButton targetType="post" targetId={post.id} disabled={isOwn} />
       </footer>

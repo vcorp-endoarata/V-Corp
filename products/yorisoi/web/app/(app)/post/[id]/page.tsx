@@ -35,7 +35,7 @@ export default async function PostDetailPage({
     .select(
       `
       id, body, category, space, empathy_count, reply_count, status, created_at,
-      author:profiles!posts_author_id_fkey(id, nickname, role, show_role),
+      author:profiles!posts_author_id_fkey(id, nickname, role, show_role, avatar_url),
       media:post_media(id, kind, storage_path, width, height, blurred)
     `,
     )
@@ -52,20 +52,28 @@ export default async function PostDetailPage({
     notFound();
   }
 
-  const [{ data: myEmpathy }, { data: myBookmark }] = await Promise.all([
-    supabase
-      .from("empathy")
-      .select("post_id")
-      .eq("user_id", user.id)
-      .eq("post_id", id)
-      .maybeSingle(),
-    supabase
-      .from("bookmarks")
-      .select("post_id")
-      .eq("user_id", user.id)
-      .eq("post_id", id)
-      .maybeSingle(),
-  ]);
+  const [{ data: myEmpathy }, { data: myBookmark }, { data: pinInfo }] =
+    await Promise.all([
+      supabase
+        .from("empathy")
+        .select("post_id")
+        .eq("user_id", user.id)
+        .eq("post_id", id)
+        .maybeSingle(),
+      supabase
+        .from("bookmarks")
+        .select("post_id")
+        .eq("user_id", user.id)
+        .eq("post_id", id)
+        .maybeSingle(),
+      supabase
+        .from("profiles")
+        .select("pinned_post_id")
+        .eq("id", user.id)
+        .maybeSingle(),
+    ]);
+  const isPinned = pinInfo?.pinned_post_id === id;
+  const isOwnPost = postAny.author.id === user.id;
 
   const { data: replies } = await supabase
     .from("replies")
@@ -93,7 +101,9 @@ export default async function PostDetailPage({
         post={post as never}
         hasEmpathy={!!myEmpathy}
         hasBookmark={!!myBookmark}
-        isOwn={postAny.author.id === user.id}
+        isOwn={isOwnPost}
+        isPinned={isPinned}
+        showPinControl={isOwnPost}
         hideReplyLink
       />
 

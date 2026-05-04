@@ -16,7 +16,7 @@ export default async function AppLayout({
   const { data: profile } = await supabase
     .from("profiles")
     .select(
-      "id, nickname, role, is_admin, font_size, reduce_motion, high_contrast, theme",
+      "id, nickname, role, is_admin, avatar_url, font_size, reduce_motion, high_contrast, theme",
     )
     .eq("id", user.id)
     .maybeSingle();
@@ -47,6 +47,7 @@ export default async function AppLayout({
       <AppHeader
         nickname={profile.nickname}
         role={profile.role}
+        avatarUrl={profile.avatar_url}
         isAdmin={profile.is_admin}
         unreadNotifications={unreadCount ?? 0}
       />
