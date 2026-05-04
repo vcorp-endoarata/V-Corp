@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { PostComposer } from "@/components/PostComposer";
 import { PostCard } from "@/components/PostCard";
 import { SpaceSwitcher } from "@/components/SpaceSwitcher";
+import { getRelationFilters } from "@/lib/relations";
 
 type SpaceKey = "self" | "family" | "shared";
 
@@ -62,6 +63,13 @@ export default async function FeedPage({
     .eq("user_id", user.id);
   const empathySet = new Set((myEmpathy ?? []).map((e) => e.post_id));
 
+  // ブロック/ミュート フィルタ
+  const { hiddenAuthors } = await getRelationFilters(user.id);
+  const filteredPosts = (posts ?? []).filter((p) => {
+    const author = (p as never as { author: { id: string } }).author;
+    return !hiddenAuthors.has(author?.id);
+  });
+
   return (
     <div className="space-y-6">
       <SpaceSwitcher current={space} accessible={accessibleSpaces} />
@@ -69,8 +77,8 @@ export default async function FeedPage({
       <PostComposer defaultSpace={space} role={profile.role} />
 
       <section className="space-y-4">
-        {posts && posts.length > 0 ? (
-          posts.map((p) => (
+        {filteredPosts.length > 0 ? (
+          filteredPosts.map((p) => (
             <PostCard
               key={p.id}
               post={p as never}

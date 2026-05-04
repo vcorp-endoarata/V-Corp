@@ -5,6 +5,7 @@ import { PrivacyForm } from "@/components/PrivacyForm";
 import { NotifyForm } from "@/components/NotifyForm";
 import { AccessibilityForm } from "@/components/AccessibilityForm";
 import { SubscribeButton } from "@/components/SubscribeButton";
+import { RelationsList } from "@/components/RelationsList";
 import { isBetaPeriod } from "@/lib/access";
 
 export const metadata = {
@@ -53,6 +54,20 @@ export default async function SettingsPage({
     .select("status, trial_end, current_period_end, cancel_at_period_end")
     .eq("user_id", user.id)
     .maybeSingle();
+
+  // ブロック/ミュート中のユーザー
+  const { data: relationsData } = await supabase
+    .from("user_relations")
+    .select(
+      "target_id, kind, target:profiles!user_relations_target_id_fkey(id, nickname)",
+    )
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+  const relations = (relationsData ?? []).map((r) => ({
+    target_id: r.target_id as string,
+    kind: r.kind as "block" | "mute",
+    target: r.target as unknown as { id: string; nickname: string },
+  }));
 
   const isActive =
     subscription?.status &&
@@ -162,6 +177,18 @@ export default async function SettingsPage({
         >
           プロフィールを編集
         </Link>
+      </section>
+
+      {/* ブロック / ミュート 管理 */}
+      <section className="rounded-2xl border border-wabi bg-white/70 p-5">
+        <h2 className="text-sm font-semibold text-ink">ブロック・ミュート</h2>
+        <p className="mt-1 text-xs leading-relaxed text-sumi/70">
+          🚫 <strong>ブロック</strong>: 相手の投稿が見えなくなります。<br />
+          🔇 <strong>ミュート</strong>: 相手の投稿をフィードから非表示。後で解除できます。
+        </p>
+        <div className="mt-4">
+          <RelationsList relations={relations} />
+        </div>
       </section>
 
       {/* プライバシー設定 */}
