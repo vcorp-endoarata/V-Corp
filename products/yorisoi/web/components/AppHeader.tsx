@@ -34,6 +34,14 @@ export function AppHeader({
             <span className="hidden md:inline">{nickname}</span>
           </Link>
           <Link
+            href="/search"
+            aria-label="検索"
+            title="検索"
+            className="text-sumi hover:text-sage"
+          >
+            🔍
+          </Link>
+          <Link
             href="/notifications"
             aria-label={
               unreadNotifications > 0
