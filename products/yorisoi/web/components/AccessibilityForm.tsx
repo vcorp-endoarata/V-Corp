@@ -49,7 +49,7 @@ export function AccessibilityForm({ initial }: { initial: A11y }) {
             <span>文字の大きさ</span>
             {savedKey === "font_size" && (
               <span className="text-xs text-sage" role="status">
-                保存
+                ✓ 保存しました
               </span>
             )}
           </span>
@@ -92,7 +92,7 @@ export function AccessibilityForm({ initial }: { initial: A11y }) {
           <span className="flex shrink-0 items-center gap-2 pt-0.5">
             {savedKey === "reduce_motion" && (
               <span className="text-xs text-sage" role="status">
-                保存
+                ✓ 保存しました
               </span>
             )}
             <input
@@ -120,7 +120,7 @@ export function AccessibilityForm({ initial }: { initial: A11y }) {
           <span className="flex shrink-0 items-center gap-2 pt-0.5">
             {savedKey === "high_contrast" && (
               <span className="text-xs text-sage" role="status">
-                保存
+                ✓ 保存しました
               </span>
             )}
             <input
