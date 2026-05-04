@@ -9,18 +9,27 @@ export const metadata = {
 };
 
 export default async function LoginPage() {
-  // 既ログイン済みなら適切なページへ
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (user) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("id")
-      .eq("id", user.id)
-      .maybeSingle();
-    redirect(profile ? "/feed" : "/onboarding");
+  // 既ログイン済みなら適切なページへ (Supabase 不通でも login 画面は表示)
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("id", user.id)
+        .maybeSingle();
+      redirect(profile ? "/feed" : "/onboarding");
+    }
+  } catch (err) {
+    // Next.js redirect() は throw するので、redirect 例外は再 throw
+    if ((err as { digest?: string })?.digest?.startsWith("NEXT_REDIRECT")) {
+      throw err;
+    }
+    console.error("[login] Supabase error:", err);
+    // Supabase 不通でも login 画面は表示
   }
 
   return (
