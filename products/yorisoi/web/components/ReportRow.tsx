@@ -19,7 +19,6 @@ type Post = {
   body: string;
   space: string;
   status: string;
-  crisis_detected: boolean;
   author: { id: string; nickname: string; role: string };
 };
 
@@ -72,21 +71,11 @@ export function ReportRow({
     });
   }
 
-  const isCrisis = report.reason === "crisis";
-
   return (
-    <article
-      className={`rounded-2xl border p-5 ${
-        isCrisis ? "border-red-300 bg-red-50/40" : "border-wabi bg-white/70"
-      }`}
-    >
+    <article className="rounded-2xl border border-wabi bg-white/70 p-5">
       <header className="flex items-start justify-between gap-3 text-xs text-sumi/70">
         <div className="flex flex-wrap items-center gap-2">
-          <span
-            className={`rounded-full px-2 py-0.5 ${
-              isCrisis ? "bg-red-200 text-red-800" : "bg-sage/15 text-sage"
-            }`}
-          >
+          <span className="rounded-full bg-sage/15 px-2 py-0.5 text-sage">
             {report.reasonLabel}
           </span>
           <span>
@@ -112,7 +101,6 @@ export function ReportRow({
           <p className="text-xs text-sumi/70">
             投稿者: <strong className="text-ink">{post.author.nickname}</strong> (
             {post.author.role}) • space: {post.space} • status: {post.status}
-            {post.crisis_detected && " • 🚨 危機検知済"}
           </p>
           <p className="mt-2 whitespace-pre-wrap text-sm text-ink">{post.body}</p>
         </div>

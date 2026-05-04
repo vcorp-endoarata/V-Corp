@@ -2,18 +2,12 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { CrisisCareCard } from "@/components/CrisisCareCard";
-
-type CrisisSeverity = "high" | "medium" | "low";
 
 export function ReplyComposer({ postId }: { postId: string }) {
   const router = useRouter();
   const [body, setBody] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
-  const [crisisSeverity, setCrisisSeverity] = useState<CrisisSeverity | null>(
-    null,
-  );
 
   const remaining = 500 - body.length;
   const disabled = body.trim().length === 0 || isPending;
@@ -29,28 +23,16 @@ export function ReplyComposer({ postId }: { postId: string }) {
       body: JSON.stringify({ body: body.trim() }),
     });
 
-    const data = (await res.json().catch(() => null)) as
-      | {
-          error?: string;
-          crisis_detected?: boolean;
-          crisis_severity?: CrisisSeverity;
-        }
-      | null;
-
     if (!res.ok) {
+      const data = (await res.json().catch(() => null)) as
+        | { error?: string }
+        | null;
       setError(data?.error ?? "返信を投稿できませんでした");
       return;
     }
 
     setBody("");
     startTransition(() => router.refresh());
-
-    if (
-      data?.crisis_detected &&
-      (data.crisis_severity === "high" || data.crisis_severity === "medium")
-    ) {
-      setCrisisSeverity(data.crisis_severity);
-    }
   }
 
   return (
@@ -91,13 +73,6 @@ export function ReplyComposer({ postId }: { postId: string }) {
         <p role="alert" className="text-sm text-sakura">
           {error}
         </p>
-      )}
-
-      {crisisSeverity && (
-        <CrisisCareCard
-          severity={crisisSeverity}
-          onClose={() => setCrisisSeverity(null)}
-        />
       )}
     </form>
   );
