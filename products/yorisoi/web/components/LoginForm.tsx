@@ -18,21 +18,42 @@ export function LoginForm() {
     setState("sending");
     setError(null);
 
-    const supabase = createClient();
-    const { error: err } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
-        shouldCreateUser: true,
-      },
-    });
+    // 15秒で諦める (ハング防止)
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(
+        () =>
+          reject(
+            new Error(
+              "サーバーから応答がありません。しばらくしてからもう一度お試しください。",
+            ),
+          ),
+        15000,
+      ),
+    );
 
-    if (err) {
+    try {
+      const supabase = createClient();
+      const result = (await Promise.race([
+        supabase.auth.signInWithOtp({
+          email,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+            shouldCreateUser: true,
+          },
+        }),
+        timeoutPromise,
+      ])) as { error: { message: string } | null };
+
+      if (result.error) {
+        setState("error");
+        setError(result.error.message);
+        return;
+      }
+      setState("sent");
+    } catch (err) {
       setState("error");
-      setError(err.message);
-      return;
+      setError(err instanceof Error ? err.message : "送信に失敗しました");
     }
-    setState("sent");
   }
 
   if (state === "sent") {
