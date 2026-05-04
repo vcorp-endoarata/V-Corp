@@ -42,6 +42,14 @@ export function AppHeader({
             🔍
           </Link>
           <Link
+            href="/bookmarks"
+            aria-label="ブックマーク"
+            title="ブックマーク"
+            className="text-sumi hover:text-sage"
+          >
+            🔖
+          </Link>
+          <Link
             href="/notifications"
             aria-label={
               unreadNotifications > 0

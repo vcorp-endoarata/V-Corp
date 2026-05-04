@@ -23,14 +23,13 @@ export default async function SearchPage({
   const q = (params.q ?? "").trim();
   const escaped = q.replace(/([%_\\])/g, "\\$1");
 
-  // 自分の empathy 履歴 (うなずき表示)
-  const { data: myEmpathy } = await supabase
-    .from("empathy")
-    .select("post_id")
-    .eq("user_id", user.id);
+  const [{ data: myEmpathy }, { data: myBookmarks }] = await Promise.all([
+    supabase.from("empathy").select("post_id").eq("user_id", user.id),
+    supabase.from("bookmarks").select("post_id").eq("user_id", user.id),
+  ]);
   const empathySet = new Set((myEmpathy ?? []).map((e) => e.post_id));
+  const bookmarkSet = new Set((myBookmarks ?? []).map((b) => b.post_id));
 
-  // 検索実行 (q が空なら検索しない)
   const { data: posts } = q
     ? await supabase
         .from("posts")
@@ -69,6 +68,7 @@ export default async function SearchPage({
                 key={p.id}
                 post={p as never}
                 hasEmpathy={empathySet.has(p.id)}
+                hasBookmark={bookmarkSet.has(p.id)}
                 isOwn={author?.id === user.id}
               />
             );

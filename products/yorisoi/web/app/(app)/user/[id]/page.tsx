@@ -28,7 +28,6 @@ export default async function PublicProfilePage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  // 自分の場合は /profile に redirect (一覧と編集機能のため)
   if (id === user.id) {
     redirect("/profile");
   }
@@ -43,20 +42,18 @@ export default async function PublicProfilePage({
 
   if (!target) notFound();
 
-  // 表示するフィールド (privacy 設定で非表示は省略)
   const showRole = target.show_role !== false;
   const showPrefecture = target.show_prefecture !== false && target.prefecture;
   const showCity = target.show_city !== false && target.city;
   const showBio = target.show_bio !== false && target.bio;
 
-  // 自分の empathy 履歴
-  const { data: myEmpathy } = await supabase
-    .from("empathy")
-    .select("post_id")
-    .eq("user_id", user.id);
+  const [{ data: myEmpathy }, { data: myBookmarks }] = await Promise.all([
+    supabase.from("empathy").select("post_id").eq("user_id", user.id),
+    supabase.from("bookmarks").select("post_id").eq("user_id", user.id),
+  ]);
   const empathySet = new Set((myEmpathy ?? []).map((e) => e.post_id));
+  const bookmarkSet = new Set((myBookmarks ?? []).map((b) => b.post_id));
 
-  // 自分が この人を block/mute してるか
   const { data: relations } = await supabase
     .from("user_relations")
     .select("kind")
@@ -65,7 +62,6 @@ export default async function PublicProfilePage({
   const blocked = (relations ?? []).some((r) => r.kind === "block");
   const muted = (relations ?? []).some((r) => r.kind === "mute");
 
-  // この人の publishedな投稿 (RLS で空間アクセス制御)
   const { data: posts } = await supabase
     .from("posts")
     .select(
@@ -153,6 +149,7 @@ export default async function PublicProfilePage({
               key={p.id}
               post={p as never}
               hasEmpathy={empathySet.has(p.id)}
+              hasBookmark={bookmarkSet.has(p.id)}
               isOwn={false}
             />
           ))

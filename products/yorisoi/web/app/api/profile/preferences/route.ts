@@ -12,6 +12,7 @@ const Body = z.object({
   font_size: z.enum(["small", "medium", "large"]).optional(),
   reduce_motion: z.boolean().optional(),
   high_contrast: z.boolean().optional(),
+  theme: z.enum(["light", "dark"]).optional(),
 });
 
 export async function PATCH(req: Request) {

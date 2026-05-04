@@ -43,19 +43,17 @@ export default async function SettingsPage({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, nickname, show_role, show_prefecture, show_city, show_bio, notify_unazuki, notify_reply, notify_admin_response, notify_email_freq, font_size, reduce_motion, high_contrast")
+    .select("id, nickname, show_role, show_prefecture, show_city, show_bio, notify_unazuki, notify_reply, notify_admin_response, notify_email_freq, font_size, reduce_motion, high_contrast, theme")
     .eq("id", user.id)
     .single();
   if (!profile) redirect("/onboarding");
 
-  // 自分の subscription 状況 (RLS で本人のみ取得)
   const { data: subscription } = await supabase
     .from("subscriptions")
     .select("status, trial_end, current_period_end, cancel_at_period_end")
     .eq("user_id", user.id)
     .maybeSingle();
 
-  // ブロック/ミュート中のユーザー
   const { data: relationsData } = await supabase
     .from("user_relations")
     .select(
@@ -85,7 +83,6 @@ export default async function SettingsPage({
         </div>
       )}
 
-      {/* Checkout 戻り通知 */}
       {params.subscription === "success" && (
         <div
           role="status"
@@ -102,7 +99,6 @@ export default async function SettingsPage({
         </div>
       )}
 
-      {/* サブスクリプション */}
       <section className="rounded-2xl border border-wabi bg-white/70 p-5">
         <h2 className="text-sm font-semibold text-ink">サブスクリプション</h2>
 
@@ -158,7 +154,6 @@ export default async function SettingsPage({
         )}
       </section>
 
-      {/* アカウント情報 */}
       <section className="rounded-2xl border border-wabi bg-white/70 p-5">
         <h2 className="text-sm font-semibold text-ink">アカウント</h2>
         <dl className="mt-3 space-y-2 text-sm text-sumi">
@@ -179,7 +174,6 @@ export default async function SettingsPage({
         </Link>
       </section>
 
-      {/* ブロック / ミュート 管理 */}
       <section className="rounded-2xl border border-wabi bg-white/70 p-5">
         <h2 className="text-sm font-semibold text-ink">ブロック・ミュート</h2>
         <p className="mt-1 text-xs leading-relaxed text-sumi/70">
@@ -191,7 +185,6 @@ export default async function SettingsPage({
         </div>
       </section>
 
-      {/* プライバシー設定 */}
       <section className="rounded-2xl border border-wabi bg-white/70 p-5">
         <h2 className="text-sm font-semibold text-ink">プライバシー</h2>
         <p className="mt-1 text-xs text-sumi/70">
@@ -210,7 +203,6 @@ export default async function SettingsPage({
         </div>
       </section>
 
-      {/* 通知設定 */}
       <section className="rounded-2xl border border-wabi bg-white/70 p-5">
         <h2 className="text-sm font-semibold text-ink">通知</h2>
         <p className="mt-1 text-xs text-sumi/70">
@@ -228,7 +220,6 @@ export default async function SettingsPage({
         </div>
       </section>
 
-      {/* アクセシビリティ */}
       <section className="rounded-2xl border border-wabi bg-white/70 p-5">
         <h2 className="text-sm font-semibold text-ink">アクセシビリティ</h2>
         <p className="mt-1 text-xs text-sumi/70">
@@ -240,12 +231,12 @@ export default async function SettingsPage({
               font_size: profile.font_size,
               reduce_motion: profile.reduce_motion,
               high_contrast: profile.high_contrast,
+              theme: profile.theme,
             }}
           />
         </div>
       </section>
 
-      {/* 法務リンク */}
       <section className="rounded-2xl border border-wabi bg-white/70 p-5">
         <h2 className="text-sm font-semibold text-ink">情報</h2>
         <ul className="mt-3 space-y-2 text-sm">
@@ -275,7 +266,6 @@ export default async function SettingsPage({
         </ul>
       </section>
 
-      {/* ログアウト */}
       <section className="rounded-2xl border border-wabi bg-white/70 p-5">
         <h2 className="text-sm font-semibold text-ink">セッション</h2>
         <form action="/auth/sign-out" method="POST" className="mt-3">
@@ -288,7 +278,6 @@ export default async function SettingsPage({
         </form>
       </section>
 
-      {/* 危険な操作 */}
       <section className="rounded-2xl border border-red-200 bg-red-50/40 p-5">
         <h2 className="text-sm font-semibold text-red-800">
           アカウントの削除
