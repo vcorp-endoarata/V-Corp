@@ -3,19 +3,31 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { WaitlistForm } from "@/components/WaitlistForm";
 
-export default async function HomePage() {
-  // ログイン済みなら LP ではなく適切なページへ自動遷移
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (user) {
+async function getLoggedInUser() {
+  // Supabase 接続失敗時でも LP は表示できるように防御
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return null;
     const { data: profile } = await supabase
       .from("profiles")
       .select("id, ban_until")
       .eq("id", user.id)
       .maybeSingle();
+    return { user, profile };
+  } catch (err) {
+    console.error("[home] Supabase error:", err);
+    return null;
+  }
+}
 
+export default async function HomePage() {
+  // ログイン済みなら LP ではなく適切なページへ自動遷移
+  const session = await getLoggedInUser();
+  if (session) {
+    const { profile } = session;
     if (
       profile?.ban_until &&
       new Date(profile.ban_until).getTime() > Date.now()
