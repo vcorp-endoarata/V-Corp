@@ -17,9 +17,15 @@ const CATEGORIES = [
 export function PostComposer({
   defaultSpace,
   role,
+  trial,
 }: {
   defaultSpace: "self" | "family" | "shared";
   role: string;
+  trial?: {
+    isTrial: boolean;
+    postsRemaining: number;
+    mediaAllowed: boolean;
+  };
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -34,6 +40,8 @@ export function PostComposer({
   const hasMedia = files.length > 0;
   const consentMissing = hasMedia && !consentConfirmed;
   const noContent = body.trim().length === 0 && !hasMedia;
+  const trialPostBlock = trial?.isTrial && trial.postsRemaining <= 0;
+  const trialMediaBlock = trial?.isTrial && !trial.mediaAllowed;
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -42,7 +50,6 @@ export function PostComposer({
     startTransition(async () => {
       setError(null);
       try {
-        // 1. Post を作成
         const res = await fetch("/api/posts", {
           method: "POST",
           headers: { "content-type": "application/json" },
@@ -55,7 +62,6 @@ export function PostComposer({
         const data = await res.json();
         if (!res.ok) throw new Error(data.error ?? "投稿できませんでした");
 
-        // 2. Media をアップロード
         if (hasMedia && data.id) {
           const supabase = createClient();
           const {
@@ -81,7 +87,6 @@ export function PostComposer({
           }
         }
 
-        // 3. リセット + リフレッシュ
         setBody("");
         setFiles([]);
         setConsentConfirmed(false);
@@ -110,13 +115,15 @@ export function PostComposer({
         aria-label="投稿本文"
       />
 
-      <div className="mt-3 border-t border-wabi/60 pt-3">
-        <MediaUploader
-          files={files}
-          onFilesChange={setFiles}
-          disabled={isPending}
-        />
-      </div>
+      {!trialMediaBlock && (
+        <div className="mt-3 border-t border-wabi/60 pt-3">
+          <MediaUploader
+            files={files}
+            onFilesChange={setFiles}
+            disabled={isPending}
+          />
+        </div>
+      )}
 
       {hasMedia && (
         <div className="mt-3 space-y-2 rounded-xl bg-sage/5 p-3">
@@ -186,11 +193,13 @@ export function PostComposer({
           <span className="text-xs text-sumi/50">{body.length} / 500</span>
           <button
             type="submit"
-            disabled={noContent || consentMissing || isPending}
+            disabled={noContent || consentMissing || trialPostBlock || isPending}
             title={
-              consentMissing
-                ? "写真・動画を投稿するには同意確認が必要です"
-                : undefined
+              trialPostBlock
+                ? "新規アカウントは 24 時間で 5 投稿までです"
+                : consentMissing
+                  ? "写真・動画を投稿するには同意確認が必要です"
+                  : undefined
             }
             className="rounded-full bg-sage px-5 py-1.5 text-sm font-semibold text-cream transition hover:opacity-90 disabled:opacity-40"
           >

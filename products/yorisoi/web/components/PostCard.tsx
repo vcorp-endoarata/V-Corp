@@ -2,7 +2,9 @@ import Link from "next/link";
 import { UnazukiButton } from "@/components/UnazukiButton";
 import { ShareButton } from "@/components/ShareButton";
 import { ReportButton } from "@/components/ReportButton";
+import { BookmarkButton } from "@/components/BookmarkButton";
 import { PostMediaDisplay } from "@/components/PostMediaDisplay";
+import { renderBodyWithTags } from "@/lib/hashtags";
 
 const CATEGORY_LABEL: Record<string, string> = {
   feeling: "🌥 気持ち",
@@ -45,6 +47,7 @@ type PostCardProps = {
   };
   hasEmpathy: boolean;
   isOwn: boolean;
+  hasBookmark?: boolean;
   /** 詳細ページ表示時など返信リンクを出さない時 */
   hideReplyLink?: boolean;
 };
@@ -66,6 +69,7 @@ export function PostCard({
   post,
   hasEmpathy,
   isOwn,
+  hasBookmark = false,
   hideReplyLink = false,
 }: PostCardProps) {
   const replyCount = post.reply_count ?? 0;
@@ -92,7 +96,7 @@ export function PostCard({
       </header>
 
       <p className="mt-3 whitespace-pre-wrap text-base leading-relaxed text-ink">
-        {post.body}
+        {renderBodyWithTags(post.body)}
       </p>
 
       {post.media && post.media.length > 0 && (
@@ -121,6 +125,7 @@ export function PostCard({
             text={post.body.slice(0, 80) + (post.body.length > 80 ? "…" : "")}
             url={`https://yorisoi.community/post/${post.id}`}
           />
+          <BookmarkButton postId={post.id} initialActive={hasBookmark} />
         </div>
         <ReportButton targetType="post" targetId={post.id} disabled={isOwn} />
       </footer>

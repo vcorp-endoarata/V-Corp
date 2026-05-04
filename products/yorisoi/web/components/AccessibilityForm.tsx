@@ -5,6 +5,7 @@ type A11y = {
   font_size: "small" | "medium" | "large";
   reduce_motion: boolean;
   high_contrast: boolean;
+  theme: "light" | "dark";
 };
 
 const SIZE_OPTIONS = [
@@ -34,6 +35,11 @@ export function AccessibilityForm({ initial }: { initial: A11y }) {
         if (!res.ok) throw new Error(data.error ?? "保存できませんでした");
         setSavedKey(key);
         setTimeout(() => setSavedKey(null), 2000);
+        // テーマ変更は即時反映するため layout の class も更新
+        if (key === "theme") {
+          const root = document.documentElement;
+          root.classList.toggle("theme-dark", value === "dark");
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : "エラーが起きました");
       }
@@ -104,6 +110,49 @@ export function AccessibilityForm({ initial }: { initial: A11y }) {
             />
           </span>
         </label>
+      </div>
+
+      {/* テーマ (ダーク/ライト) */}
+      <div className="rounded-xl border border-wabi bg-white/40 p-3">
+        <span className="flex items-center justify-between text-sm font-semibold text-ink">
+          <span>外観テーマ</span>
+          {savedKey === "theme" && (
+            <span className="text-xs text-sage" role="status">
+              ✓ 保存しました
+            </span>
+          )}
+        </span>
+        <span className="mt-1 block text-xs leading-relaxed text-sumi/70">
+          画面の明るさを切り替えできます。
+        </span>
+        <div className="mt-3 flex gap-2">
+          <button
+            type="button"
+            onClick={() => update("theme", "light")}
+            disabled={isPending}
+            aria-pressed={a11y.theme === "light"}
+            className={`flex-1 rounded-lg border px-3 py-2 text-sm transition ${
+              a11y.theme === "light"
+                ? "border-sage bg-sage/10 text-ink"
+                : "border-wabi bg-white text-sumi hover:bg-sage/5"
+            }`}
+          >
+            ☀️ ライト
+          </button>
+          <button
+            type="button"
+            onClick={() => update("theme", "dark")}
+            disabled={isPending}
+            aria-pressed={a11y.theme === "dark"}
+            className={`flex-1 rounded-lg border px-3 py-2 text-sm transition ${
+              a11y.theme === "dark"
+                ? "border-sage bg-sage/10 text-ink"
+                : "border-wabi bg-white text-sumi hover:bg-sage/5"
+            }`}
+          >
+            🌙 ダーク
+          </button>
+        </div>
       </div>
 
       {/* 高コントラスト */}
