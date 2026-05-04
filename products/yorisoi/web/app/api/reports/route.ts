@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
 
 const Body = z.object({
   target_type: z.enum(["post", "user", "media", "reply"]),
@@ -11,7 +10,6 @@ const Body = z.object({
     "spam",
     "sexual",
     "self_harm",
-    "crisis",
     "minor_safety",
     "no_consent_media",
     "misinformation",
@@ -64,22 +62,6 @@ export async function POST(req: Request) {
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  // 危機関連通報は service_role で 即 hidden 化 (post / reply 両対応)
-  if (parsed.data.reason === "crisis") {
-    const admin = createAdminClient();
-    if (parsed.data.target_type === "post") {
-      await admin
-        .from("posts")
-        .update({ status: "hidden", crisis_detected: true })
-        .eq("id", parsed.data.target_id);
-    } else if (parsed.data.target_type === "reply") {
-      await admin
-        .from("replies")
-        .update({ status: "hidden" })
-        .eq("id", parsed.data.target_id);
-    }
   }
 
   return NextResponse.json({ ok: true });

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -14,7 +13,6 @@ const REASON_LABEL: Record<string, string> = {
   spam: "スパム",
   sexual: "性的内容",
   self_harm: "自傷",
-  crisis: "🚨 危機",
   minor_safety: "未成年安全",
   no_consent_media: "同意無メディア",
   misinformation: "誤情報",
@@ -64,7 +62,7 @@ export default async function AdminPage() {
     ? await admin
         .from("posts")
         .select(
-          "id, body, space, status, crisis_detected, created_at, author:profiles!posts_author_id_fkey(id, nickname, role)",
+          "id, body, space, status, created_at, author:profiles!posts_author_id_fkey(id, nickname, role)",
         )
         .in("id", postIds)
     : { data: [] };
@@ -78,11 +76,6 @@ export default async function AdminPage() {
     return acc;
   }, {});
 
-  const { count: pendingCrisisCount } = await admin
-    .from("crisis_events")
-    .select("id", { count: "exact", head: true })
-    .eq("reviewed_by_admin", false);
-
   return (
     <div className="space-y-6">
       <header>
@@ -92,25 +85,6 @@ export default async function AdminPage() {
           reviewing: {counts.reviewing ?? 0}
         </p>
       </header>
-
-      <nav className="flex gap-2 text-xs">
-        <Link
-          href="/admin"
-          className="rounded-full bg-sage/20 px-3 py-1.5 text-sage"
-        >
-          📋 通報一覧
-        </Link>
-        <Link
-          href="/admin/crisis"
-          className={`rounded-full px-3 py-1.5 ${
-            (pendingCrisisCount ?? 0) > 0
-              ? "bg-sakura/20 text-sakura"
-              : "border border-wabi text-sumi hover:bg-sage/5"
-          }`}
-        >
-          🌿 危機イベント ({pendingCrisisCount ?? 0})
-        </Link>
-      </nav>
 
       {!reports || reports.length === 0 ? (
         <div className="rounded-2xl border border-wabi bg-white/70 p-10 text-center text-sm text-sumi/70">
@@ -142,7 +116,6 @@ export default async function AdminPage() {
                         body: post.body,
                         space: post.space,
                         status: post.status,
-                        crisis_detected: post.crisis_detected,
                         author: post.author as unknown as {
                           id: string;
                           nickname: string;

@@ -6,7 +6,6 @@ const REASONS = [
   { value: "spam", label: "スパム・宣伝" },
   { value: "sexual", label: "性的・不適切な内容" },
   { value: "self_harm", label: "自傷を促す内容" },
-  { value: "crisis", label: "緊急の助けが必要そう" },
   { value: "minor_safety", label: "未成年の安全に関わる内容" },
   { value: "no_consent_media", label: "本人同意のない写真・動画" },
   { value: "misinformation", label: "誤った医療情報" },
