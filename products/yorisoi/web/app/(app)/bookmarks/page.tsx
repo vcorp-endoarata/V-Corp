@@ -45,7 +45,7 @@ export default async function BookmarksPage() {
       post_id,
       post:posts!bookmarks_post_id_fkey(
         id, body, category, space, empathy_count, reply_count, created_at, status,
-        author:profiles!posts_author_id_fkey(id, nickname, role, show_role),
+        author:profiles!posts_author_id_fkey(id, nickname, role, show_role, avatar_url),
         media:post_media(id, kind, storage_path, width, height, blurred)
       )
     `,
@@ -54,14 +54,12 @@ export default async function BookmarksPage() {
     .order("created_at", { ascending: false })
     .limit(100);
 
-  // RLS で見れない post は post=null。published 以外も除外。
   const posts = ((rows as unknown as BookmarkRow[]) ?? [])
     .map((r) => r.post)
     .filter(
       (p): p is NonNullable<typeof p> => p !== null && p.status === "published",
     );
 
-  // empathy 履歴
   const { data: myEmpathy } = await supabase
     .from("empathy")
     .select("post_id")

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Avatar } from "@/components/Avatar";
 
 const ROLE_LABEL: Record<string, string> = {
   self: "当事者",
@@ -9,11 +10,13 @@ const ROLE_LABEL: Record<string, string> = {
 export function AppHeader({
   nickname,
   role,
+  avatarUrl,
   isAdmin = false,
   unreadNotifications = 0,
 }: {
   nickname: string;
   role: string;
+  avatarUrl?: string | null;
   isAdmin?: boolean;
   unreadNotifications?: number;
 }) {
@@ -26,8 +29,10 @@ export function AppHeader({
         <div className="flex items-center gap-3 text-sm">
           <Link
             href="/profile"
+            aria-label="自分のプロフィール"
             className="flex items-center gap-2 text-sumi hover:text-sage"
           >
+            <Avatar url={avatarUrl} nickname={nickname} size="sm" />
             <span className="rounded-full bg-sage/10 px-2 py-0.5 text-xs text-sage">
               {ROLE_LABEL[role] ?? role}
             </span>

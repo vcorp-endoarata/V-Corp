@@ -57,7 +57,7 @@ export default async function TagPage({ params }: Props) {
       post_id,
       post:posts!post_tags_post_id_fkey(
         id, body, category, space, empathy_count, reply_count, created_at, status,
-        author:profiles!posts_author_id_fkey(id, nickname, role, show_role),
+        author:profiles!posts_author_id_fkey(id, nickname, role, show_role, avatar_url),
         media:post_media(id, kind, storage_path, width, height, blurred)
       )
     `,
@@ -72,7 +72,6 @@ export default async function TagPage({ params }: Props) {
       (p): p is NonNullable<typeof p> => p !== null && p.status === "published",
     );
 
-  // empathy / bookmark / relation
   const [{ data: myEmpathy }, { data: myBookmarks }, { hiddenAuthors }] =
     await Promise.all([
       supabase.from("empathy").select("post_id").eq("user_id", user.id),

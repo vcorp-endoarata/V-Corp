@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { PostCard } from "@/components/PostCard";
 import { RelationMenu } from "@/components/RelationMenu";
+import { Avatar } from "@/components/Avatar";
 
 export const metadata = {
   title: "プロフィール — よりそい",
@@ -35,7 +36,7 @@ export default async function PublicProfilePage({
   const { data: target } = await supabase
     .from("profiles")
     .select(
-      "id, nickname, role, prefecture, city, bio, created_at, show_role, show_prefecture, show_city, show_bio",
+      "id, nickname, role, prefecture, city, bio, avatar_url, pinned_post_id, created_at, show_role, show_prefecture, show_city, show_bio",
     )
     .eq("id", id)
     .maybeSingle();
@@ -62,12 +63,31 @@ export default async function PublicProfilePage({
   const blocked = (relations ?? []).some((r) => r.kind === "block");
   const muted = (relations ?? []).some((r) => r.kind === "mute");
 
+  // ピン留めされた投稿 (本人公開・published のみ)
+  type PinPost = { id: string };
+  let pinnedPost: PinPost | null = null;
+  if (target.pinned_post_id) {
+    const { data: pin } = await supabase
+      .from("posts")
+      .select(
+        `
+        id, body, category, space, empathy_count, reply_count, created_at, status,
+        author:profiles!posts_author_id_fkey(id, nickname, role, show_role, avatar_url),
+        media:post_media(id, kind, storage_path, width, height, blurred)
+      `,
+      )
+      .eq("id", target.pinned_post_id)
+      .eq("status", "published")
+      .maybeSingle();
+    pinnedPost = pin as PinPost | null;
+  }
+
   const { data: posts } = await supabase
     .from("posts")
     .select(
       `
       id, body, category, space, empathy_count, reply_count, created_at,
-      author:profiles!posts_author_id_fkey(id, nickname, role, show_role),
+      author:profiles!posts_author_id_fkey(id, nickname, role, show_role, avatar_url),
       media:post_media(id, kind, storage_path, width, height, blurred)
     `,
     )
@@ -75,6 +95,11 @@ export default async function PublicProfilePage({
     .eq("status", "published")
     .order("created_at", { ascending: false })
     .limit(30);
+
+  // ピン留め投稿は通常一覧から除外 (重複防止)
+  const otherPosts = (posts ?? []).filter(
+    (p) => (p as { id: string }).id !== target.pinned_post_id,
+  );
 
   return (
     <div className="space-y-6">
@@ -87,23 +112,32 @@ export default async function PublicProfilePage({
 
       <header className="rounded-2xl border border-wabi bg-white/70 p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="font-display text-2xl text-ink">{target.nickname}</h1>
-            {showRole && (
-              <span className="rounded-full bg-sage/10 px-3 py-1 text-xs text-sage">
-                {ROLE_LABEL[target.role] ?? target.role}
-              </span>
-            )}
-            {blocked && (
-              <span className="rounded-full bg-sumi/10 px-3 py-1 text-xs text-sumi">
-                ブロック中
-              </span>
-            )}
-            {muted && (
-              <span className="rounded-full bg-sumi/10 px-3 py-1 text-xs text-sumi">
-                ミュート中
-              </span>
-            )}
+          <div className="flex flex-wrap items-center gap-4">
+            <Avatar
+              url={target.avatar_url}
+              nickname={target.nickname}
+              size="lg"
+            />
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="font-display text-2xl text-ink">
+                {target.nickname}
+              </h1>
+              {showRole && (
+                <span className="rounded-full bg-sage/10 px-3 py-1 text-xs text-sage">
+                  {ROLE_LABEL[target.role] ?? target.role}
+                </span>
+              )}
+              {blocked && (
+                <span className="rounded-full bg-sumi/10 px-3 py-1 text-xs text-sumi">
+                  ブロック中
+                </span>
+              )}
+              {muted && (
+                <span className="rounded-full bg-sumi/10 px-3 py-1 text-xs text-sumi">
+                  ミュート中
+                </span>
+              )}
+            </div>
           </div>
           <RelationMenu
             targetUserId={target.id}
@@ -139,17 +173,29 @@ export default async function PublicProfilePage({
         </p>
       </header>
 
+      {pinnedPost ? (
+        <section aria-label="ピン留めされた投稿">
+          <PostCard
+            post={pinnedPost as never}
+            hasEmpathy={empathySet.has(pinnedPost.id)}
+            hasBookmark={bookmarkSet.has(pinnedPost.id)}
+            isOwn={false}
+            pinnedBadge
+          />
+        </section>
+      ) : null}
+
       <section aria-labelledby="posts-heading" className="space-y-4">
         <h2 id="posts-heading" className="text-sm font-semibold text-ink">
           投稿 ({posts?.length ?? 0})
         </h2>
-        {posts && posts.length > 0 ? (
-          posts.map((p) => (
+        {otherPosts.length > 0 ? (
+          otherPosts.map((p) => (
             <PostCard
-              key={p.id}
+              key={(p as { id: string }).id}
               post={p as never}
-              hasEmpathy={empathySet.has(p.id)}
-              hasBookmark={bookmarkSet.has(p.id)}
+              hasEmpathy={empathySet.has((p as { id: string }).id)}
+              hasBookmark={bookmarkSet.has((p as { id: string }).id)}
               isOwn={false}
             />
           ))
