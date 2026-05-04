@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { getTrialStatus, TRIAL_MAX_POSTS } from "@/lib/trial";
 
 const Body = z.object({
   body: z.string().trim().min(1).max(500),
@@ -33,11 +34,22 @@ export async function POST(req: Request) {
   // role と space の整合性チェック (RLS でも弾かれるが UX のため事前)
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role")
+    .select("role, created_at")
     .eq("id", user.id)
     .single();
   if (!profile) {
     return NextResponse.json({ error: "プロフィールがありません" }, { status: 400 });
+  }
+
+  // トライアル期間中 (登録から 24h) は投稿数制限
+  const trial = await getTrialStatus(supabase, user.id, profile.created_at);
+  if (trial.isTrial && trial.postsRemaining <= 0) {
+    return NextResponse.json(
+      {
+        error: `新規アカウントは 24 時間で ${TRIAL_MAX_POSTS} 投稿までです。あと ${trial.hoursLeft} 時間で解除されます。`,
+      },
+      { status: 429 },
+    );
   }
   if (parsed.data.space === "self" && profile.role !== "self") {
     return NextResponse.json(

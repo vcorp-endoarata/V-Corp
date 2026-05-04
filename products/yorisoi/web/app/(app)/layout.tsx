@@ -16,7 +16,7 @@ export default async function AppLayout({
   const { data: profile } = await supabase
     .from("profiles")
     .select(
-      "id, nickname, role, is_admin, font_size, reduce_motion, high_contrast",
+      "id, nickname, role, is_admin, font_size, reduce_motion, high_contrast, theme",
     )
     .eq("id", user.id)
     .maybeSingle();
@@ -37,6 +37,7 @@ export default async function AppLayout({
         : "text-[16px]",
     profile.reduce_motion ? "motion-reduce-on" : "",
     profile.high_contrast ? "high-contrast-on" : "",
+    profile.theme === "dark" ? "theme-dark" : "",
   ]
     .filter(Boolean)
     .join(" ");

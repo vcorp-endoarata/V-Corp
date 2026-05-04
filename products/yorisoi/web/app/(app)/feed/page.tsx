@@ -3,9 +3,29 @@ import { createClient } from "@/lib/supabase/server";
 import { PostComposer } from "@/components/PostComposer";
 import { PostCard } from "@/components/PostCard";
 import { SpaceSwitcher } from "@/components/SpaceSwitcher";
+import { CategoryFilter } from "@/components/CategoryFilter";
+import { TrialBanner } from "@/components/TrialBanner";
+import { RealtimeFeedListener } from "@/components/RealtimeFeedListener";
 import { getRelationFilters } from "@/lib/relations";
+import { getTrialStatus } from "@/lib/trial";
 
 type SpaceKey = "self" | "family" | "shared";
+type Category =
+  | "feeling"
+  | "worry"
+  | "experience"
+  | "question"
+  | "celebration"
+  | "diary";
+
+const VALID_CATEGORIES: Category[] = [
+  "feeling",
+  "worry",
+  "experience",
+  "question",
+  "celebration",
+  "diary",
+];
 
 export const metadata = {
   title: "フィード — よりそい",
@@ -15,7 +35,7 @@ export const metadata = {
 export default async function FeedPage({
   searchParams,
 }: {
-  searchParams: Promise<{ space?: string }>;
+  searchParams: Promise<{ space?: string; category?: string }>;
 }) {
   const supabase = await createClient();
   const {
@@ -25,12 +45,11 @@ export default async function FeedPage({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, nickname, role")
+    .select("id, nickname, role, created_at")
     .eq("id", user.id)
     .single();
   if (!profile) redirect("/onboarding");
 
-  // role に応じてアクセス可能スペース
   const accessibleSpaces: SpaceKey[] =
     profile.role === "self" ? ["self", "shared"] : ["family", "shared"];
   const defaultSpace = accessibleSpaces[0];
@@ -41,8 +60,13 @@ export default async function FeedPage({
     requested && accessibleSpaces.includes(requested) ? requested : defaultSpace
   ) as SpaceKey;
 
-  // posts 取得 (RLS で自動フィルタ)
-  const { data: posts } = await supabase
+  const requestedCategory = params.category as Category | undefined;
+  const category =
+    requestedCategory && VALID_CATEGORIES.includes(requestedCategory)
+      ? requestedCategory
+      : undefined;
+
+  let query = supabase
     .from("posts")
     .select(
       `
@@ -52,19 +76,22 @@ export default async function FeedPage({
     `,
     )
     .eq("space", space)
-    .eq("status", "published")
+    .eq("status", "published");
+  if (category) query = query.eq("category", category);
+  const { data: posts } = await query
     .order("created_at", { ascending: false })
     .limit(50);
 
-  // 自分の empathy 履歴 (どの post にうなずいたか)
-  const { data: myEmpathy } = await supabase
-    .from("empathy")
-    .select("post_id")
-    .eq("user_id", user.id);
+  const [{ data: myEmpathy }, { data: myBookmarks }, { hiddenAuthors }, trial] =
+    await Promise.all([
+      supabase.from("empathy").select("post_id").eq("user_id", user.id),
+      supabase.from("bookmarks").select("post_id").eq("user_id", user.id),
+      getRelationFilters(user.id),
+      getTrialStatus(supabase, user.id, profile.created_at),
+    ]);
   const empathySet = new Set((myEmpathy ?? []).map((e) => e.post_id));
+  const bookmarkSet = new Set((myBookmarks ?? []).map((b) => b.post_id));
 
-  // ブロック/ミュート フィルタ
-  const { hiddenAuthors } = await getRelationFilters(user.id);
   const filteredPosts = (posts ?? []).filter((p) => {
     const author = (p as never as { author: { id: string } }).author;
     return !hiddenAuthors.has(author?.id);
@@ -73,8 +100,26 @@ export default async function FeedPage({
   return (
     <div className="space-y-6">
       <SpaceSwitcher current={space} accessible={accessibleSpaces} />
+      <CategoryFilter current={category} space={space} />
 
-      <PostComposer defaultSpace={space} role={profile.role} />
+      {trial.isTrial && (
+        <TrialBanner
+          hoursLeft={trial.hoursLeft}
+          postsRemaining={trial.postsRemaining}
+        />
+      )}
+
+      <PostComposer
+        defaultSpace={space}
+        role={profile.role}
+        trial={{
+          isTrial: trial.isTrial,
+          postsRemaining: trial.postsRemaining,
+          mediaAllowed: trial.mediaAllowed,
+        }}
+      />
+
+      <RealtimeFeedListener space={space} currentUserId={user.id} />
 
       <section className="space-y-4">
         {filteredPosts.length > 0 ? (
@@ -83,12 +128,15 @@ export default async function FeedPage({
               key={p.id}
               post={p as never}
               hasEmpathy={empathySet.has(p.id)}
+              hasBookmark={bookmarkSet.has(p.id)}
               isOwn={(p as never as { author: { id: string } }).author?.id === user.id}
             />
           ))
         ) : (
           <div className="rounded-2xl border border-dashed border-wabi p-10 text-center text-sm text-sumi/70">
-            まだ投稿がありません。
+            {category
+              ? "このカテゴリーの投稿はまだありません。"
+              : "まだ投稿がありません。"}
             <br />
             最初のひとことを、書いてみませんか?
           </div>

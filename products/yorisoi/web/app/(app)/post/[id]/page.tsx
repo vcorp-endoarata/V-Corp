@@ -30,7 +30,6 @@ export default async function PostDetailPage({
     .single();
   if (!profile) redirect("/onboarding");
 
-  // post (RLS で空間アクセス制御済)
   const { data: post } = await supabase
     .from("posts")
     .select(
@@ -45,7 +44,6 @@ export default async function PostDetailPage({
 
   if (!post) notFound();
 
-  // hidden / deleted 投稿は本人以外には 404 (本人には見せる)
   const postAny = post as never as {
     status: string;
     author: { id: string };
@@ -54,15 +52,21 @@ export default async function PostDetailPage({
     notFound();
   }
 
-  // 自分のうなずき有無
-  const { data: myEmpathy } = await supabase
-    .from("empathy")
-    .select("post_id")
-    .eq("user_id", user.id)
-    .eq("post_id", id)
-    .maybeSingle();
+  const [{ data: myEmpathy }, { data: myBookmark }] = await Promise.all([
+    supabase
+      .from("empathy")
+      .select("post_id")
+      .eq("user_id", user.id)
+      .eq("post_id", id)
+      .maybeSingle(),
+    supabase
+      .from("bookmarks")
+      .select("post_id")
+      .eq("user_id", user.id)
+      .eq("post_id", id)
+      .maybeSingle(),
+  ]);
 
-  // 返信一覧 (作成順)
   const { data: replies } = await supabase
     .from("replies")
     .select(
@@ -88,11 +92,11 @@ export default async function PostDetailPage({
       <PostCard
         post={post as never}
         hasEmpathy={!!myEmpathy}
+        hasBookmark={!!myBookmark}
         isOwn={postAny.author.id === user.id}
         hideReplyLink
       />
 
-      {/* 返信フォーム */}
       <section
         aria-labelledby="reply-section"
         className="rounded-2xl border border-wabi/60 bg-cream p-5"
@@ -108,7 +112,6 @@ export default async function PostDetailPage({
         </div>
       </section>
 
-      {/* 返信一覧 */}
       <section
         aria-labelledby="replies-list"
         className="space-y-3"
