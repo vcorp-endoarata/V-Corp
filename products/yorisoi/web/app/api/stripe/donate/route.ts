@@ -30,7 +30,7 @@ export async function POST(req: Request) {
 
   const stripe = getStripe();
 
-  // ログイン中なら user_id を metadata に (匿名寄付も歓迎)
+  // ログイン中なら user_id を metadata に (匿名サポートも歓迎)
   const supabase = await createClient();
   const {
     data: { user },
