@@ -111,6 +111,25 @@ export const emailTemplates = {
       }」</p>
        <a href="${postUrl}" style="display: inline-block; background: #5a7e5a; color: #fdfaf3; padding: 10px 20px; border-radius: 999px; text-decoration: none; font-size: 13px;">返信を見る →</a>`,
     ),
+
+  invite: ({ code }: { code: string }) =>
+    EMAIL_LAYOUT(
+      `🌱 <strong>よりそい α 版</strong> へのご招待です`,
+      `<p style="margin: 0 0 16px; line-height: 1.8;">
+         お待たせしました。「よりそい」 α 版にご招待いたします。<br>
+         発達障害の当事者と、家族・身近な人が、評価のない場所で
+         ゆっくり寄り添い合えるコミュニティです。
+       </p>
+       <p style="margin: 0 0 8px;">あなたの招待コード:</p>
+       <p style="margin: 0 0 20px; padding: 12px 16px; background: #fdfaf3; border: 1px dashed #5a7e5a; border-radius: 8px; font-family: monospace; font-size: 16px; color: #2d2a26; text-align: center; letter-spacing: 0.05em;">
+         <strong>${escapeHtml(code)}</strong>
+       </p>
+       <a href="${SITE_URL}/login" style="display: inline-block; background: #5a7e5a; color: #fdfaf3; padding: 12px 28px; border-radius: 999px; text-decoration: none; font-size: 14px; font-weight: 600;">ログインして始める →</a>
+       <p style="margin: 20px 0 0; font-size: 12px; color: #8a857d; line-height: 1.7;">
+         ログインページで、上記の招待コードとメールアドレスを入力してください。<br>
+         ご質問は <a href="mailto:arata@v-corp.inc" style="color: #5a7e5a;">arata@v-corp.inc</a> まで。
+       </p>`,
+    ),
 };
 
 function escapeHtml(s: string): string {
