@@ -39,4 +39,4 @@ npm run dev
 ## 運営
 
 - 代表: 遠藤 新大 (個人事業主)
-- お問い合わせ: hello@yorisoi.community
+- お問い合わせ: arata@v-corp.inc
