@@ -155,6 +155,20 @@ export default async function SettingsPage({
         )}
       </section>
 
+      <section className="rounded-2xl border border-sage/30 bg-sage/5 p-5">
+        <h2 className="text-sm font-semibold text-ink">🌱 サポート (任意)</h2>
+        <p className="mt-2 text-xs leading-relaxed text-sumi">
+          サブスクリプションとは別に、ワンタイムでよりそいの運営をサポートできます。
+          いただいたサポートは、利用料を払えない当事者の場所を守ることに使われます。
+        </p>
+        <Link
+          href="/support"
+          className="mt-4 inline-block rounded-full bg-sage px-4 py-1.5 text-sm font-semibold text-cream hover:opacity-90"
+        >
+          サポートする →
+        </Link>
+      </section>
+
       <section className="rounded-2xl border border-wabi bg-white/70 p-5">
         <h2 className="text-sm font-semibold text-ink">アカウント</h2>
         <dl className="mt-3 space-y-3 text-sm text-sumi">
@@ -259,6 +273,11 @@ export default async function SettingsPage({
           <li>
             <Link href="/legal/tokutei" className="text-sage hover:underline">
               特定商取引法に基づく表記
+            </Link>
+          </li>
+          <li>
+            <Link href="/support" className="text-sage hover:underline">
+              よりそい をサポート
             </Link>
           </li>
           <li>
