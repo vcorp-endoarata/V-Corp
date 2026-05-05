@@ -84,6 +84,14 @@ export default async function AdminPage() {
           運営者: {profile.nickname} • 通報 pending: {counts.pending ?? 0} /
           reviewing: {counts.reviewing ?? 0}
         </p>
+        <nav className="mt-3 flex gap-2 text-xs">
+          <a
+            href="/admin/invites"
+            className="rounded-full border border-wabi bg-white/70 px-3 py-1 text-sumi hover:bg-sage/5"
+          >
+            招待管理 →
+          </a>
+        </nav>
       </header>
 
       {!reports || reports.length === 0 ? (
