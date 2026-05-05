@@ -16,11 +16,11 @@ const CATEGORIES = [
 
 export function PostComposer({
   defaultSpace,
-  role,
   trial,
 }: {
   defaultSpace: "self" | "family" | "shared";
-  role: string;
+  /** 互換性のため残す (未使用) */
+  role?: string;
   trial?: {
     isTrial: boolean;
     postsRemaining: number;
@@ -31,7 +31,8 @@ export function PostComposer({
   const [isPending, startTransition] = useTransition();
   const [body, setBody] = useState("");
   const [category, setCategory] = useState<typeof CATEGORIES[number]["value"]>("diary");
-  const [space, setSpace] = useState<"self" | "family" | "shared">(defaultSpace);
+  // space は表示中のスペース (上部の SpaceSwitcher) と一致させる。投稿時に切り替える必要は無い。
+  const space = defaultSpace;
   const [error, setError] = useState<string | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [consentConfirmed, setConsentConfirmed] = useState(false);
@@ -97,8 +98,6 @@ export function PostComposer({
       }
     });
   }
-
-  const ownSpaces = role === "self" ? ["self", "shared"] : ["family", "shared"];
 
   return (
     <form
@@ -167,23 +166,6 @@ export function PostComposer({
             {CATEGORIES.map((c) => (
               <option key={c.value} value={c.value}>
                 {c.label}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={space}
-            onChange={(e) => setSpace(e.target.value as typeof space)}
-            className="rounded-full border border-wabi bg-white px-3 py-1 text-xs text-sumi outline-none focus:border-sage"
-            aria-label="どこに投稿するか"
-          >
-            {ownSpaces.map((s) => (
-              <option key={s} value={s}>
-                {s === "self"
-                  ? "🌱 当事者の場"
-                  : s === "family"
-                    ? "🤲 身近な人の場"
-                    : "🌅 みんなの場"}
               </option>
             ))}
           </select>
