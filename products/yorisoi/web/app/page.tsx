@@ -90,7 +90,8 @@ export default async function HomePage() {
           <strong>2026年6月1日 (月) サービス開始予定</strong>
         </p>
         <p className="mt-2 text-xs leading-relaxed text-sumi/70">
-          ご契約時から14日間は無料、その後は毎月初に自動課金されます。
+          ご契約から14日間は無料です。15日目に初回 ¥300 が課金され、
+          以降は毎月同日に自動課金されます。
           <br />
           いつでも解約可能。
         </p>
