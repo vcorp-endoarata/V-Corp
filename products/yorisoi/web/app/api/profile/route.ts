@@ -35,8 +35,21 @@ export async function PATCH(req: Request) {
     update.prefecture = parsed.data.prefecture;
   if (parsed.data.city !== undefined) update.city = parsed.data.city;
   if (parsed.data.bio !== undefined) update.bio = parsed.data.bio;
-  if (parsed.data.avatar_url !== undefined)
+  if (parsed.data.avatar_url !== undefined) {
+    // 外部URLの偽装を防ぐ: 自分の avatars/<uid>/ 配下のみ許可 (null は OK)
+    if (parsed.data.avatar_url !== null) {
+      const supabaseUrl =
+        process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;
+      const expected = `${supabaseUrl}/storage/v1/object/public/avatars/${user.id}/`;
+      if (!parsed.data.avatar_url.startsWith(expected)) {
+        return NextResponse.json(
+          { error: "不正な画像 URL です" },
+          { status: 400 },
+        );
+      }
+    }
     update.avatar_url = parsed.data.avatar_url;
+  }
 
   const { error } = await supabase.from("profiles").update(update).eq("id", user.id);
 
