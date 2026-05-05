@@ -1,5 +1,12 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  clearInviteCookie,
+  isInviteRequired,
+  readInviteCookie,
+  redeemInviteCode,
+} from "@/lib/invite";
 
 /**
  * Magic link / Email confirmation コールバック。
@@ -8,7 +15,8 @@ import { createClient } from "@/lib/supabase/server";
  *   - PKCE フロー  → ?code=xxx           → exchangeCodeForSession()
  *   - OTP フロー   → ?token_hash=xxx     → verifyOtp()
  *
- * 両方をハンドルする。
+ * α 版招待制 (INVITE_REQUIRED=true) のとき、新規ユーザーは
+ * 招待コード cookie を必須とし、ここで原子的に redeem する。
  */
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
@@ -34,7 +42,6 @@ export async function GET(request: NextRequest) {
   const supabase = await createClient();
 
   if (code) {
-    // PKCE flow
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (error) {
       return NextResponse.redirect(
@@ -42,7 +49,6 @@ export async function GET(request: NextRequest) {
       );
     }
   } else if (tokenHash && type) {
-    // OTP / magic link flow
     const { error } = await supabase.auth.verifyOtp({
       type: type as
         | "signup"
@@ -62,7 +68,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${origin}/login?error=missing_token`);
   }
 
-  // profiles 行存在チェック
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -76,9 +81,52 @@ export async function GET(request: NextRequest) {
     .eq("id", user.id)
     .maybeSingle();
 
-  if (!profile) {
-    return NextResponse.redirect(`${origin}/onboarding`);
+  // 既存ユーザーは α 版でも素通し
+  if (profile) {
+    await clearInviteCookie();
+    return NextResponse.redirect(`${origin}${next}`);
   }
 
-  return NextResponse.redirect(`${origin}${next}`);
+  // ★ 新規ユーザー (profile なし) — α 版招待制チェック
+  if (isInviteRequired()) {
+    const inviteCode = await readInviteCookie();
+    if (!inviteCode) {
+      // 招待コードなしで新規アクセス → セッション破棄して error 表示
+      await supabase.auth.signOut();
+      return NextResponse.redirect(
+        `${origin}/login?error=${encodeURIComponent(
+          "現在は招待制です。招待コードを入力するか、ウェイトリストにご登録ください。",
+        )}`,
+      );
+    }
+
+    // 原子的 redeem。失敗 (race lost or expired) なら sign out
+    const result = await redeemInviteCode(inviteCode, user.id);
+    await clearInviteCookie();
+    if (!result.ok) {
+      await supabase.auth.signOut();
+      return NextResponse.redirect(
+        `${origin}/login?error=${encodeURIComponent(
+          "招待コードが無効化されました。もう一度ご確認ください。",
+        )}`,
+      );
+    }
+
+    // ウェイトリスト経由なら waitlist 行も更新 (ベストエフォート、失敗しても続行)
+    try {
+      const admin = createAdminClient();
+      await admin
+        .from("waitlist")
+        .update({
+          invited_at: new Date().toISOString(),
+          invite_code: inviteCode,
+        })
+        .eq("email", user.email ?? "")
+        .is("invited_at", null);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  return NextResponse.redirect(`${origin}/onboarding`);
 }
