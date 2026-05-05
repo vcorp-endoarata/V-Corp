@@ -138,10 +138,10 @@ export function DonateForm() {
         (贈与ではなく、サービス運営への任意のサポートです)。
         領収書が必要な方は{" "}
         <a
-          href="mailto:hello@yorisoi.community?subject=サポートの領収書希望"
+          href="mailto:arata@v-corp.inc?subject=サポートの領収書希望"
           className="text-sage hover:underline"
         >
-          hello@yorisoi.community
+          arata@v-corp.inc
         </a>{" "}
         までお問い合わせください。
       </p>

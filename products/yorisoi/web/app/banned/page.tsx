@@ -49,10 +49,10 @@ export default async function BannedPage() {
       <p className="mt-6 text-sm leading-relaxed text-sumi">
         異議申し立てがある場合は、
         <a
-          href="mailto:hello@yorisoi.community"
+          href="mailto:arata@v-corp.inc"
           className="text-sage underline"
         >
-          hello@yorisoi.community
+          arata@v-corp.inc
         </a>
         までご連絡ください。
       </p>

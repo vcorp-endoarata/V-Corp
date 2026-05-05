@@ -41,10 +41,10 @@ export default async function ThanksPage({
         <p className="mt-6 text-sm text-sumi/70">
           領収書が必要な方は{" "}
           <a
-            href="mailto:hello@yorisoi.community?subject=サポートの領収書希望"
+            href="mailto:arata@v-corp.inc?subject=サポートの領収書希望"
             className="text-sage hover:underline"
           >
-            hello@yorisoi.community
+            arata@v-corp.inc
           </a>{" "}
           までご連絡ください。
         </p>

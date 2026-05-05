@@ -80,7 +80,7 @@ export default async function HomePage() {
           月額 <span className="text-sage">¥300</span>
         </p>
         <p className="mt-2 text-xs text-sumi/70">
-          税込・14日間の無料トライアル付き
+          税込、14日間の無料トライアル付き
         </p>
         <p className="mt-4 text-sm text-sumi">
           <strong>2026年6月1日 (月) サービス開始予定</strong>
@@ -157,10 +157,11 @@ export default async function HomePage() {
       <footer className="mt-24 text-xs text-sumi/60">
         <p>運営: 遠藤 新大</p>
         <p className="mt-2 space-x-3">
+          <a href="/support" className="text-sage hover:underline">🌱 サポート</a>
           <a href="/legal/tokutei" className="hover:text-sage">特定商取引法</a>
           <a href="/legal/terms" className="hover:text-sage">利用規約</a>
           <a href="/legal/privacy" className="hover:text-sage">プライバシー</a>
-          <a href="mailto:hello@yorisoi.community" className="hover:text-sage">
+          <a href="mailto:arata@v-corp.inc" className="hover:text-sage">
             お問い合わせ
           </a>
         </p>

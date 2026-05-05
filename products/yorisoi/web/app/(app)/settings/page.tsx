@@ -155,6 +155,20 @@ export default async function SettingsPage({
         )}
       </section>
 
+      <section className="rounded-2xl border border-sage/30 bg-sage/5 p-5">
+        <h2 className="text-sm font-semibold text-ink">🌱 サポート (任意)</h2>
+        <p className="mt-2 text-xs leading-relaxed text-sumi">
+          サブスクリプションとは別に、ワンタイムでよりそいの運営をサポートできます。
+          いただいたサポートは、利用料を払えない当事者の場所を守ることに使われます。
+        </p>
+        <Link
+          href="/support"
+          className="mt-4 inline-block rounded-full bg-sage px-4 py-1.5 text-sm font-semibold text-cream hover:opacity-90"
+        >
+          サポートする →
+        </Link>
+      </section>
+
       <section className="rounded-2xl border border-wabi bg-white/70 p-5">
         <h2 className="text-sm font-semibold text-ink">アカウント</h2>
         <dl className="mt-3 space-y-3 text-sm text-sumi">
@@ -262,11 +276,16 @@ export default async function SettingsPage({
             </Link>
           </li>
           <li>
+            <Link href="/support" className="text-sage hover:underline">
+              よりそい をサポート
+            </Link>
+          </li>
+          <li>
             <a
-              href="mailto:hello@yorisoi.community"
+              href="mailto:arata@v-corp.inc"
               className="text-sage hover:underline"
             >
-              お問い合わせ (hello@yorisoi.community)
+              お問い合わせ (arata@v-corp.inc)
             </a>
           </li>
         </ul>
@@ -295,10 +314,10 @@ export default async function SettingsPage({
         <p className="mt-3 text-xs text-sumi">
           削除をご希望の場合は{" "}
           <a
-            href="mailto:hello@yorisoi.community?subject=アカウント削除依頼"
+            href="mailto:arata@v-corp.inc?subject=アカウント削除依頼"
             className="text-red-700 underline"
           >
-            hello@yorisoi.community
+            arata@v-corp.inc
           </a>{" "}
           までご連絡ください。本人確認後、48時間以内に対応します。
         </p>
