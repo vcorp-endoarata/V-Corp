@@ -20,9 +20,9 @@ const ROWS: [string, React.ReactNode][] = [
     <a
       key="m"
       className="text-sage hover:underline"
-      href="mailto:hello@yorisoi.community"
+      href="mailto:arata@v-corp.inc"
     >
-      hello@yorisoi.community
+      arata@v-corp.inc
     </a>,
   ],
   [

@@ -149,10 +149,10 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
         <p>
           メール:{" "}
           <a
-            href="mailto:hello@yorisoi.community"
+            href="mailto:arata@v-corp.inc"
             className="text-sage hover:underline"
           >
-            hello@yorisoi.community
+            arata@v-corp.inc
           </a>
         </p>
         <p>事業者: 遠藤 新大</p>
