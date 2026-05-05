@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { WaitlistForm } from "@/components/WaitlistForm";
+import { isInviteRequired } from "@/lib/invite";
 
 async function getLoggedInUser() {
   // Supabase 接続失敗時でも LP は表示できるように防御
@@ -40,6 +41,8 @@ export default async function HomePage() {
     redirect("/feed");
   }
 
+  const inviteRequired = isInviteRequired();
+
   return (
     <main className="relative mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center px-6 py-16 text-center">
       {/* 右上にログイン導線 */}
@@ -51,7 +54,9 @@ export default async function HomePage() {
       </Link>
 
       <span className="mt-6 rounded-full border border-sage/40 bg-sage/10 px-4 py-1 text-xs tracking-wider text-sage">
-        2026年 オープン準備中
+        {inviteRequired
+          ? "🌱 α 版・招待制で開放中"
+          : "2026年 オープン準備中"}
       </span>
 
       <h1 className="mt-8 font-display text-5xl leading-[1.15] tracking-tight md:text-7xl">
@@ -70,7 +75,6 @@ export default async function HomePage() {
         比較せず、攻撃せず、ただ <strong>寄り添える</strong> 場所を作っています。
       </p>
 
-      {/* 料金 (Stripe 自動審査が「商品/価格あり」と認識できるよう LP 上部に明示) */}
       <section
         id="pricing"
         className="mx-auto mt-12 w-full max-w-md rounded-2xl border-2 border-sage/40 bg-white/60 p-6 text-center"
@@ -97,7 +101,6 @@ export default async function HomePage() {
         </p>
       </section>
 
-      {/* 運営者開示 — founder-market fit を明示 */}
       <section
         id="about"
         className="mx-auto mt-8 max-w-md rounded-2xl border border-sage/30 bg-sage/5 p-6 text-left text-sm leading-relaxed"
@@ -145,13 +148,43 @@ export default async function HomePage() {
       </div>
 
       <div className="mt-16 w-full">
-        <p className="mb-4 text-xs text-sumi">
-          オープン通知を受け取る or{" "}
-          <Link href="/login" className="text-sage underline">
-            既にアカウントをお持ちの方はログイン
-          </Link>
-        </p>
-        <WaitlistForm />
+        {inviteRequired ? (
+          <>
+            <div className="flex flex-wrap justify-center gap-3">
+              <Link
+                href="/login"
+                className="rounded-2xl bg-sage px-6 py-3 text-sm font-semibold text-cream hover:opacity-90"
+              >
+                招待コードでログイン
+              </Link>
+              <a
+                href="#waitlist"
+                className="rounded-2xl border border-sage/40 bg-white/60 px-6 py-3 text-sm font-semibold text-sage hover:bg-sage/5"
+              >
+                ウェイトリストに登録
+              </a>
+            </div>
+            <p className="mt-3 text-xs text-sumi/70">
+              正式公開: フォロワー 1,000 人到達時 または 2026/7/1 を予定
+            </p>
+            <div id="waitlist" className="mt-12">
+              <p className="mb-4 text-xs text-sumi">
+                招待コードがない方はこちら
+              </p>
+              <WaitlistForm />
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="mb-4 text-xs text-sumi">
+              オープン通知を受け取る or{" "}
+              <Link href="/login" className="text-sage underline">
+                既にアカウントをお持ちの方はログイン
+              </Link>
+            </p>
+            <WaitlistForm />
+          </>
+        )}
       </div>
 
       <footer className="mt-24 text-xs text-sumi/60">

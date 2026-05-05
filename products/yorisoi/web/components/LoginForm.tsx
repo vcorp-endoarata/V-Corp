@@ -3,11 +3,12 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-export function LoginForm() {
+export function LoginForm({ inviteRequired = false }: { inviteRequired?: boolean }) {
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/feed";
 
   const [email, setEmail] = useState("");
+  const [inviteCode, setInviteCode] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">(
     "idle",
   );
@@ -18,20 +19,35 @@ export function LoginForm() {
     setState("sending");
     setError(null);
 
-    // 15秒で諦める (ハング防止)
-    const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(
-        () =>
-          reject(
-            new Error(
-              "サーバーから応答がありません。しばらくしてからもう一度お試しください。",
-            ),
-          ),
-        15000,
-      ),
-    );
-
     try {
+      // Step 1: 招待コード入力されていれば先に検証 → cookie 設定
+      if (inviteCode.trim()) {
+        const res = await fetch("/api/invite/validate", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ code: inviteCode.trim() }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          setState("error");
+          setError(data.error ?? "招待コードが無効です");
+          return;
+        }
+      }
+
+      // Step 2: Magic Link 送信 (15s timeout)
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(
+          () =>
+            reject(
+              new Error(
+                "サーバーから応答がありません。しばらくしてからもう一度お試しください。",
+              ),
+            ),
+          15000,
+        ),
+      );
+
       const supabase = createClient();
       const result = (await Promise.race([
         supabase.auth.signInWithOtp({
@@ -90,12 +106,31 @@ export function LoginForm() {
 
   return (
     <form onSubmit={onSubmit} className="mt-12 space-y-4">
+      {inviteRequired && (
+        <label className="block text-sm font-semibold text-ink">
+          招待コード <span className="text-xs text-sumi/60">(新規登録の方のみ)</span>
+          <input
+            type="text"
+            placeholder="yorisoi-xxxxxxxx"
+            value={inviteCode}
+            onChange={(e) => setInviteCode(e.target.value)}
+            disabled={state === "sending"}
+            autoComplete="off"
+            spellCheck={false}
+            className="mt-2 block w-full rounded-2xl border border-wabi bg-white px-5 py-3 text-base text-ink outline-none placeholder:text-ink/30 focus:border-sage disabled:opacity-50"
+          />
+          <span className="mt-1 block text-[11px] leading-relaxed text-sumi/60">
+            既にアカウントをお持ちの方は、空欄のまま送信してください。
+          </span>
+        </label>
+      )}
+
       <label className="block text-sm font-semibold text-ink">
         メールアドレス
         <input
           type="email"
           required
-          autoFocus
+          autoFocus={!inviteRequired}
           autoComplete="email"
           placeholder="you@example.com"
           value={email}
