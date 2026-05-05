@@ -6,6 +6,7 @@ import { NotifyForm } from "@/components/NotifyForm";
 import { AccessibilityForm } from "@/components/AccessibilityForm";
 import { SubscribeButton } from "@/components/SubscribeButton";
 import { RelationsList } from "@/components/RelationsList";
+import { EmailChangeForm } from "@/components/EmailChangeForm";
 import { isBetaPeriod } from "@/lib/access";
 
 export const metadata = {
@@ -156,14 +157,19 @@ export default async function SettingsPage({
 
       <section className="rounded-2xl border border-wabi bg-white/70 p-5">
         <h2 className="text-sm font-semibold text-ink">アカウント</h2>
-        <dl className="mt-3 space-y-2 text-sm text-sumi">
+        <dl className="mt-3 space-y-3 text-sm text-sumi">
           <div className="flex justify-between">
             <dt>ニックネーム</dt>
             <dd className="text-ink">{profile.nickname}</dd>
           </div>
-          <div className="flex justify-between">
-            <dt>メールアドレス</dt>
-            <dd className="text-ink">{user.email}</dd>
+          <div>
+            <div className="flex items-center justify-between">
+              <dt>メールアドレス</dt>
+              <dd className="text-ink">{user.email}</dd>
+            </div>
+            <div className="mt-2 flex justify-end">
+              <EmailChangeForm currentEmail={user.email ?? ""} />
+            </div>
           </div>
         </dl>
         <Link
