@@ -161,7 +161,7 @@ export default async function HomePage() {
           <a href="/legal/tokutei" className="hover:text-sage">特定商取引法</a>
           <a href="/legal/terms" className="hover:text-sage">利用規約</a>
           <a href="/legal/privacy" className="hover:text-sage">プライバシー</a>
-          <a href="mailto:hello@yorisoi.community" className="hover:text-sage">
+          <a href="mailto:arata@v-corp.inc" className="hover:text-sage">
             お問い合わせ
           </a>
         </p>

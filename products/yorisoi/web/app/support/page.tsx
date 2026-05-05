@@ -63,10 +63,10 @@ export default function SupportPage() {
           <p>
             <strong className="text-sumi">問い合わせ</strong>:{" "}
             <a
-              href="mailto:hello@yorisoi.community"
+              href="mailto:arata@v-corp.inc"
               className="text-sage hover:underline"
             >
-              hello@yorisoi.community
+              arata@v-corp.inc
             </a>
           </p>
           <p className="pt-2">

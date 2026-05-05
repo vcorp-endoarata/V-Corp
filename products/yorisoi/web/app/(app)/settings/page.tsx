@@ -282,10 +282,10 @@ export default async function SettingsPage({
           </li>
           <li>
             <a
-              href="mailto:hello@yorisoi.community"
+              href="mailto:arata@v-corp.inc"
               className="text-sage hover:underline"
             >
-              お問い合わせ (hello@yorisoi.community)
+              お問い合わせ (arata@v-corp.inc)
             </a>
           </li>
         </ul>
@@ -314,10 +314,10 @@ export default async function SettingsPage({
         <p className="mt-3 text-xs text-sumi">
           削除をご希望の場合は{" "}
           <a
-            href="mailto:hello@yorisoi.community?subject=アカウント削除依頼"
+            href="mailto:arata@v-corp.inc?subject=アカウント削除依頼"
             className="text-red-700 underline"
           >
-            hello@yorisoi.community
+            arata@v-corp.inc
           </a>{" "}
           までご連絡ください。本人確認後、48時間以内に対応します。
         </p>
