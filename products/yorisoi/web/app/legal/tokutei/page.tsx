@@ -41,7 +41,7 @@ const ROWS: [string, React.ReactNode][] = [
     "支払方法",
     "クレジットカード決済 (Stripe Inc. を通じて Visa / Mastercard / JCB / American Express / Diners Club に対応)",
   ],
-  ["支払時期", "月次サブスクリプション。申込時、および各更新日に自動課金"],
+  ["支払時期", "月次サブスクリプション。14日間の無料トライアル終了時に初回課金、以降は毎月同日に自動課金"],
   [
     "サービス提供時期",
     "決済完了後、即時にサービスへのアクセス権を発行します",
@@ -65,7 +65,7 @@ export default function TokuteiPage() {
       <h1 className="mt-6 font-display text-4xl md:text-5xl">
         特定商取引法に基づく表記
       </h1>
-      <p className="mt-4 text-sm text-sumi/70">最終更新日: 2026年5月3日</p>
+      <p className="mt-4 text-sm text-sumi/70">最終更新日: 2026年5月5日</p>
 
       <dl className="mt-12 divide-y divide-wabi border-y border-wabi">
         {ROWS.map(([term, def]) => (
