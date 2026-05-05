@@ -4,6 +4,7 @@ import { ShareButton } from "@/components/ShareButton";
 import { ReportButton } from "@/components/ReportButton";
 import { BookmarkButton } from "@/components/BookmarkButton";
 import { PinButton } from "@/components/PinButton";
+import { PostDeleteButton } from "@/components/PostDeleteButton";
 import { Avatar } from "@/components/Avatar";
 import { PostMediaDisplay } from "@/components/PostMediaDisplay";
 import { renderBodyWithTags } from "@/lib/hashtags";
@@ -151,7 +152,15 @@ export function PostCard({
             <PinButton postId={post.id} initialPinned={isPinned} />
           )}
         </div>
-        <ReportButton targetType="post" targetId={post.id} disabled={isOwn} />
+        <div className="flex items-center gap-1">
+          {isOwn && (
+            <PostDeleteButton
+              postId={post.id}
+              hasReplies={(post.reply_count ?? 0) > 0}
+            />
+          )}
+          <ReportButton targetType="post" targetId={post.id} disabled={isOwn} />
+        </div>
       </footer>
     </article>
   );
