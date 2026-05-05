@@ -1,11 +1,10 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { PostComposer } from "@/components/PostComposer";
-import { PostCard } from "@/components/PostCard";
 import { SpaceSwitcher } from "@/components/SpaceSwitcher";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { TrialBanner } from "@/components/TrialBanner";
-import { RealtimeFeedListener } from "@/components/RealtimeFeedListener";
+import { FeedRealtime } from "@/components/FeedRealtime";
 import { ListeningSection } from "@/components/ListeningSection";
 import { getRelationFilters } from "@/lib/relations";
 import { getTrialStatus } from "@/lib/trial";
@@ -100,6 +99,7 @@ export default async function FeedPage({
   const empathySet = new Set((myEmpathy ?? []).map((e) => e.post_id));
   const bookmarkSet = new Set((myBookmarks ?? []).map((b) => b.post_id));
 
+  const hiddenAuthorIds = Array.from(hiddenAuthors);
   const filteredPosts = (posts ?? []).filter((p) => {
     const author = (p as never as { author: { id: string } }).author;
     return !hiddenAuthors.has(author?.id);
@@ -127,29 +127,20 @@ export default async function FeedPage({
         }}
       />
 
-      <RealtimeFeedListener space={space} currentUserId={user.id} />
-
-      <section className="space-y-4">
-        {filteredPosts.length > 0 ? (
-          filteredPosts.map((p) => (
-            <PostCard
-              key={p.id}
-              post={p as never}
-              hasEmpathy={empathySet.has(p.id)}
-              hasBookmark={bookmarkSet.has(p.id)}
-              isOwn={(p as never as { author: { id: string } }).author?.id === user.id}
-            />
-          ))
-        ) : (
-          <div className="rounded-2xl border border-dashed border-wabi p-10 text-center text-sm text-sumi/70">
-            {category
-              ? "このカテゴリーの投稿はまだありません。"
-              : "まだ投稿がありません。"}
-            <br />
-            最初のひとことを、書いてみませんか?
-          </div>
-        )}
-      </section>
+      <FeedRealtime
+        initialPosts={filteredPosts as never}
+        initialEmpathySet={Array.from(empathySet)}
+        initialBookmarkSet={Array.from(bookmarkSet)}
+        hiddenAuthorIds={hiddenAuthorIds}
+        space={space}
+        category={category}
+        currentUserId={user.id}
+        emptyMessage={
+          category
+            ? "このカテゴリーの投稿はまだありません。\n最初のひとことを、書いてみませんか?"
+            : "まだ投稿がありません。\n最初のひとことを、書いてみませんか?"
+        }
+      />
 
       <ListeningSection
         posts={waitingPosts}

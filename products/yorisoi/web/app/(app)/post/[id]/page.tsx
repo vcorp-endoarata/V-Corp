@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { PostCard } from "@/components/PostCard";
 import { ReplyComposer } from "@/components/ReplyComposer";
-import { ReplyCard } from "@/components/ReplyCard";
+import { PostRepliesRealtime } from "@/components/PostRepliesRealtime";
 
 export const metadata = {
   title: "投稿 — よりそい",
@@ -122,45 +122,15 @@ export default async function PostDetailPage({
         </div>
       </section>
 
-      <section
-        aria-labelledby="replies-list"
-        className="space-y-3"
-      >
-        <h2
-          id="replies-list"
-          className="text-sm font-semibold text-ink"
-        >
-          みんなの返信 ({replies?.length ?? 0})
+      <section aria-labelledby="replies-list" className="space-y-3">
+        <h2 id="replies-list" className="text-sm font-semibold text-ink">
+          みんなの返信
         </h2>
-        {replies && replies.length > 0 ? (
-          replies.map((r) => {
-            const reply = r as never as {
-              id: string;
-              body: string;
-              created_at: string;
-              author_id: string;
-              author: {
-                id: string;
-                nickname: string;
-                role: string;
-                show_role?: boolean;
-              };
-            };
-            return (
-              <ReplyCard
-                key={reply.id}
-                reply={reply}
-                isOwn={reply.author_id === user.id}
-              />
-            );
-          })
-        ) : (
-          <div className="rounded-2xl border border-dashed border-wabi p-8 text-center text-sm text-sumi/60">
-            まだ返信はありません。
-            <br />
-            最初の「そばにいるよ」を、書いてみませんか?
-          </div>
-        )}
+        <PostRepliesRealtime
+          postId={id}
+          initialReplies={(replies ?? []) as never}
+          currentUserId={user.id}
+        />
       </section>
     </div>
   );

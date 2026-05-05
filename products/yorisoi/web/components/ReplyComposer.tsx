@@ -44,7 +44,7 @@ export function ReplyComposer({ postId }: { postId: string }) {
         id="reply-body"
         value={body}
         onChange={(e) => setBody(e.target.value)}
-        placeholder="そっと返事を書く…"
+        placeholder="返事を書く"
         rows={3}
         maxLength={500}
         className="w-full rounded-2xl border border-wabi bg-white/80 px-4 py-3 text-sm text-ink placeholder:text-sumi/50 focus:border-sage focus:outline-none focus:ring-1 focus:ring-sage"
