@@ -6,8 +6,10 @@ import { SpaceSwitcher } from "@/components/SpaceSwitcher";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { TrialBanner } from "@/components/TrialBanner";
 import { RealtimeFeedListener } from "@/components/RealtimeFeedListener";
+import { ListeningSection } from "@/components/ListeningSection";
 import { getRelationFilters } from "@/lib/relations";
 import { getTrialStatus } from "@/lib/trial";
+import { getWaitingPosts } from "@/lib/listening";
 
 type SpaceKey = "self" | "family" | "shared";
 type Category =
@@ -82,13 +84,19 @@ export default async function FeedPage({
     .order("created_at", { ascending: false })
     .limit(50);
 
-  const [{ data: myEmpathy }, { data: myBookmarks }, { hiddenAuthors }, trial] =
-    await Promise.all([
-      supabase.from("empathy").select("post_id").eq("user_id", user.id),
-      supabase.from("bookmarks").select("post_id").eq("user_id", user.id),
-      getRelationFilters(user.id),
-      getTrialStatus(supabase, user.id, profile.created_at),
-    ]);
+  const [
+    { data: myEmpathy },
+    { data: myBookmarks },
+    { hiddenAuthors },
+    trial,
+    waitingPosts,
+  ] = await Promise.all([
+    supabase.from("empathy").select("post_id").eq("user_id", user.id),
+    supabase.from("bookmarks").select("post_id").eq("user_id", user.id),
+    getRelationFilters(user.id),
+    getTrialStatus(supabase, user.id, profile.created_at),
+    getWaitingPosts(supabase, user.id, 10),
+  ]);
   const empathySet = new Set((myEmpathy ?? []).map((e) => e.post_id));
   const bookmarkSet = new Set((myBookmarks ?? []).map((b) => b.post_id));
 
@@ -142,6 +150,13 @@ export default async function FeedPage({
           </div>
         )}
       </section>
+
+      <ListeningSection
+        posts={waitingPosts}
+        empathySet={empathySet}
+        bookmarkSet={bookmarkSet}
+        preview
+      />
     </div>
   );
 }
