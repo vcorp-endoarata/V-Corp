@@ -196,9 +196,26 @@ export default async function SettingsPage({
 
       <section className="rounded-2xl border border-wabi bg-white/70 p-5">
         <h2 className="text-sm font-semibold text-ink">ブロック・ミュート</h2>
-        <p className="mt-1 text-xs leading-relaxed text-sumi/70">
-          🚫 <strong>ブロック</strong>: 相手の投稿が見えなくなります。<br />
-          🔇 <strong>ミュート</strong>: 相手の投稿をフィードから非表示。後で解除できます。
+        <ul className="mt-2 space-y-2 text-xs leading-relaxed text-sumi">
+          <li>
+            <strong className="text-ink">🔇 ミュート</strong>{" "}
+            <span className="text-sumi/80">— 相手を見たくないとき</span>
+            <br />
+            <span className="text-sumi/70">
+              この人の投稿が <strong>自分のフィード</strong> に出てこなくなります。相手にバレません。
+            </span>
+          </li>
+          <li>
+            <strong className="text-ink">🚫 ブロック</strong>{" "}
+            <span className="text-sumi/80">— 自分を見せたくないとき</span>
+            <br />
+            <span className="text-sumi/70">
+              自分の投稿が <strong>相手のフィード</strong> に出てこなくなります。相手にバレません。
+            </span>
+          </li>
+        </ul>
+        <p className="mt-3 text-xs text-sumi/60">
+          どちらも後でいつでも解除できます。
         </p>
         <div className="mt-4">
           <RelationsList relations={relations} />

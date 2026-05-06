@@ -80,16 +80,16 @@ export function RelationMenu({
             type="button"
             onClick={() => toggle("mute", muted)}
             disabled={isPending}
-            className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-sumi hover:bg-sage/5 disabled:opacity-50"
+            className="flex w-full items-start gap-2 px-4 py-3 text-left text-sm text-sumi hover:bg-sage/5 disabled:opacity-50"
           >
-            <span aria-hidden>🔇</span>
+            <span aria-hidden className="mt-0.5">🔇</span>
             <span>
-              {muted ? "ミュート解除" : "ミュートする"}
+              {muted ? "ミュートを解除する" : "ミュートする"}
               <br />
               <span className="text-xs text-sumi/60">
                 {muted
-                  ? "このユーザーの投稿を再表示"
-                  : "このユーザーの投稿をフィードから非表示"}
+                  ? "再びこの人の投稿が自分のフィードに表示されます"
+                  : "この人の投稿を 自分のフィードから 見えなくします (相手にはバレません)"}
               </span>
             </span>
           </button>
@@ -98,16 +98,16 @@ export function RelationMenu({
             type="button"
             onClick={() => toggle("block", blocked)}
             disabled={isPending}
-            className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-sumi hover:bg-sakura/5 disabled:opacity-50"
+            className="flex w-full items-start gap-2 px-4 py-3 text-left text-sm text-sumi hover:bg-sakura/5 disabled:opacity-50"
           >
-            <span aria-hidden>🚫</span>
+            <span aria-hidden className="mt-0.5">🚫</span>
             <span>
-              {blocked ? "ブロック解除" : "ブロックする"}
+              {blocked ? "ブロックを解除する" : "ブロックする"}
               <br />
               <span className="text-xs text-sumi/60">
                 {blocked
-                  ? "ブロックを解除する"
-                  : "投稿の非表示 + 接触を防止"}
+                  ? "再び自分の投稿がこの人のフィードに表示されるようになります"
+                  : "自分の投稿を この人のフィードに表示させなくします (相手にはバレません)"}
               </span>
             </span>
           </button>
