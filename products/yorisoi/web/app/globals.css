@@ -14,7 +14,7 @@ body {
   font-feature-settings: "palt";
 }
 
-/* やわらかいスクロール挙動 */
+/* やわらかいスクロール挑動 */
 html {
   scroll-behavior: smooth;
 }
@@ -24,46 +24,6 @@ html {
   outline: 2px solid #7A9C86;
   outline-offset: 2px;
   border-radius: 6px;
-}
-
-/* === アクセシビリティ設定 === */
-
-/* アニメーション削減 (発作・チック誘発防止) */
-.motion-reduce-on *,
-.motion-reduce-on *::before,
-.motion-reduce-on *::after {
-  animation-duration: 0.001ms !important;
-  animation-iteration-count: 1 !important;
-  transition-duration: 0.001ms !important;
-  scroll-behavior: auto !important;
-}
-
-/* 高コントラスト */
-.high-contrast-on {
-  --tw-text-opacity: 1 !important;
-}
-.high-contrast-on .text-sumi,
-.high-contrast-on .text-sumi\/70,
-.high-contrast-on .text-sumi\/60,
-.high-contrast-on .text-sumi\/50 {
-  color: #1a1a1a !important;
-  opacity: 1 !important;
-}
-.high-contrast-on .text-ink {
-  color: #000 !important;
-}
-.high-contrast-on .border-wabi,
-.high-contrast-on .border-wabi\/60,
-.high-contrast-on .border-sage\/40 {
-  border-color: #555 !important;
-}
-.high-contrast-on .bg-sage\/10,
-.high-contrast-on .bg-sage\/5 {
-  background-color: #c8d8c8 !important;
-}
-.high-contrast-on .bg-white\/70,
-.high-contrast-on .bg-white\/60 {
-  background-color: #fff !important;
 }
 
 /* === ダークモード ===

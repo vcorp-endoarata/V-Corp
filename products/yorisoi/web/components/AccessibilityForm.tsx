@@ -3,8 +3,6 @@ import { useState, useTransition } from "react";
 
 type A11y = {
   font_size: "small" | "medium" | "large";
-  reduce_motion: boolean;
-  high_contrast: boolean;
   theme: "light" | "dark";
 };
 
@@ -35,10 +33,17 @@ export function AccessibilityForm({ initial }: { initial: A11y }) {
         if (!res.ok) throw new Error(data.error ?? "保存できませんでした");
         setSavedKey(key);
         setTimeout(() => setSavedKey(null), 2000);
-        // テーマ変更は即時反映するため layout の class も更新
+        // 即時反映
         if (key === "theme") {
-          const root = document.documentElement;
-          root.classList.toggle("theme-dark", value === "dark");
+          document.documentElement.classList.toggle(
+            "theme-dark",
+            value === "dark",
+          );
+        }
+        if (key === "font_size") {
+          const px =
+            value === "small" ? 14 : value === "large" ? 18 : 16;
+          document.documentElement.style.fontSize = `${px}px`;
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "エラーが起きました");
@@ -50,81 +55,50 @@ export function AccessibilityForm({ initial }: { initial: A11y }) {
     <div className="space-y-3">
       {/* フォントサイズ */}
       <div className="rounded-xl border border-wabi bg-white/40 p-3">
-        <label className="block">
-          <span className="flex items-center justify-between text-sm font-semibold text-ink">
-            <span>文字の大きさ</span>
-            {savedKey === "font_size" && (
-              <span className="text-xs text-sage" role="status">
-                ✓ 保存しました
-              </span>
-            )}
-          </span>
-          <span className="mt-1 block text-xs leading-relaxed text-sumi/70">
-            読みやすい大きさを選んでください
-          </span>
-          <div className="mt-3 flex gap-2">
-            {SIZE_OPTIONS.map((o) => (
-              <button
-                key={o.value}
-                type="button"
-                onClick={() => update("font_size", o.value)}
-                disabled={isPending}
-                aria-pressed={a11y.font_size === o.value}
-                className={`flex-1 rounded-lg border px-3 py-2 transition ${
-                  a11y.font_size === o.value
-                    ? "border-sage bg-sage/10 text-ink"
-                    : "border-wabi bg-white text-sumi hover:bg-sage/5"
-                }`}
-              >
-                <span className={`block ${o.sample}`}>{o.label}</span>
-              </button>
-            ))}
-          </div>
-        </label>
-      </div>
-
-      {/* アニメーション削減 */}
-      <div className="rounded-xl border border-wabi bg-white/40 p-3">
-        <label className="flex cursor-pointer items-start justify-between gap-3">
-          <span className="flex-1">
-            <span className="block text-sm font-semibold text-ink">
-              アニメーションを減らす
+        <div className="flex items-center justify-between text-sm font-semibold text-ink">
+          <span>文字の大きさ</span>
+          {savedKey === "font_size" && (
+            <span className="text-xs text-sage" role="status">
+              ✓ 保存しました
             </span>
-            <span className="mt-1 block text-xs leading-relaxed text-sumi/70">
-              点滅・回転などの動きを最小化します。
-              発作・チック誘発が心配な方に推奨。
-            </span>
-          </span>
-          <span className="flex shrink-0 items-center gap-2 pt-0.5">
-            {savedKey === "reduce_motion" && (
-              <span className="text-xs text-sage" role="status">
-                ✓ 保存しました
-              </span>
-            )}
-            <input
-              type="checkbox"
-              checked={a11y.reduce_motion}
-              onChange={(e) => update("reduce_motion", e.target.checked)}
+          )}
+        </div>
+        <p className="mt-1 text-xs leading-relaxed text-sumi/70">
+          画面全体の文字サイズが変わります。
+        </p>
+        <div className="mt-3 flex gap-2">
+          {SIZE_OPTIONS.map((o) => (
+            <button
+              key={o.value}
+              type="button"
+              onClick={() => update("font_size", o.value)}
               disabled={isPending}
-              className="h-5 w-5 cursor-pointer accent-sage"
-            />
-          </span>
-        </label>
+              aria-pressed={a11y.font_size === o.value}
+              className={`flex-1 rounded-lg border px-3 py-2 transition ${
+                a11y.font_size === o.value
+                  ? "border-sage bg-sage/10 text-ink"
+                  : "border-wabi bg-white text-sumi hover:bg-sage/5"
+              }`}
+            >
+              <span className={`block ${o.sample}`}>{o.label}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* テーマ (ダーク/ライト) */}
       <div className="rounded-xl border border-wabi bg-white/40 p-3">
-        <span className="flex items-center justify-between text-sm font-semibold text-ink">
+        <div className="flex items-center justify-between text-sm font-semibold text-ink">
           <span>外観テーマ</span>
           {savedKey === "theme" && (
             <span className="text-xs text-sage" role="status">
               ✓ 保存しました
             </span>
           )}
-        </span>
-        <span className="mt-1 block text-xs leading-relaxed text-sumi/70">
+        </div>
+        <p className="mt-1 text-xs leading-relaxed text-sumi/70">
           画面の明るさを切り替えできます。
-        </span>
+        </p>
         <div className="mt-3 flex gap-2">
           <button
             type="button"
@@ -153,34 +127,6 @@ export function AccessibilityForm({ initial }: { initial: A11y }) {
             🌙 ダーク
           </button>
         </div>
-      </div>
-
-      {/* 高コントラスト */}
-      <div className="rounded-xl border border-wabi bg-white/40 p-3">
-        <label className="flex cursor-pointer items-start justify-between gap-3">
-          <span className="flex-1">
-            <span className="block text-sm font-semibold text-ink">
-              高コントラスト表示
-            </span>
-            <span className="mt-1 block text-xs leading-relaxed text-sumi/70">
-              文字と背景のコントラストを強くします。読みやすさが向上。
-            </span>
-          </span>
-          <span className="flex shrink-0 items-center gap-2 pt-0.5">
-            {savedKey === "high_contrast" && (
-              <span className="text-xs text-sage" role="status">
-                ✓ 保存しました
-              </span>
-            )}
-            <input
-              type="checkbox"
-              checked={a11y.high_contrast}
-              onChange={(e) => update("high_contrast", e.target.checked)}
-              disabled={isPending}
-              className="h-5 w-5 cursor-pointer accent-sage"
-            />
-          </span>
-        </label>
       </div>
 
       {error && (

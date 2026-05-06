@@ -15,9 +15,7 @@ export default async function AppLayout({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select(
-      "id, nickname, role, is_admin, avatar_url, font_size, reduce_motion, high_contrast, theme",
-    )
+    .select("id, nickname, role, is_admin, avatar_url, font_size, theme")
     .eq("id", user.id)
     .maybeSingle();
   if (!profile) redirect("/onboarding");
@@ -28,30 +26,36 @@ export default async function AppLayout({
     .select("id", { count: "exact", head: true })
     .is("read_at", null);
 
-  // a11y 設定を class として付与 (globals.css で対応する CSS 定義)
-  const a11yClasses = [
+  // 文字サイズは html の font-size を上書きすることで実現
+  // (Tailwind の text-* は rem ベースなのでこれで全画面スケールする)
+  const fontSizePx =
     profile.font_size === "small"
-      ? "text-[14px]"
+      ? 14
       : profile.font_size === "large"
-        ? "text-[18px]"
-        : "text-[16px]",
-    profile.reduce_motion ? "motion-reduce-on" : "",
-    profile.high_contrast ? "high-contrast-on" : "",
-    profile.theme === "dark" ? "theme-dark" : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
+        ? 18
+        : 16;
+
+  const themeClass = profile.theme === "dark" ? "theme-dark" : "";
 
   return (
-    <div className={`min-h-screen ${a11yClasses}`}>
-      <AppHeader
-        nickname={profile.nickname}
-        role={profile.role}
-        avatarUrl={profile.avatar_url}
-        isAdmin={profile.is_admin}
-        unreadNotifications={unreadCount ?? 0}
+    <>
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `html { font-size: ${fontSizePx}px; }`,
+        }}
       />
-      <div className="mx-auto max-w-2xl px-4 pb-24 pt-4 md:pt-8">{children}</div>
-    </div>
+      <div className={`min-h-screen ${themeClass}`}>
+        <AppHeader
+          nickname={profile.nickname}
+          role={profile.role}
+          avatarUrl={profile.avatar_url}
+          isAdmin={profile.is_admin}
+          unreadNotifications={unreadCount ?? 0}
+        />
+        <div className="mx-auto max-w-2xl px-4 pb-24 pt-4 md:pt-8">
+          {children}
+        </div>
+      </div>
+    </>
   );
 }

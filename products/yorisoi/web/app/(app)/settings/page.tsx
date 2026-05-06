@@ -44,7 +44,7 @@ export default async function SettingsPage({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, nickname, show_role, show_prefecture, show_city, show_bio, notify_unazuki, notify_reply, notify_admin_response, notify_email_freq, font_size, reduce_motion, high_contrast, theme")
+    .select("id, nickname, show_role, show_prefecture, show_city, show_bio, notify_unazuki, notify_reply, notify_admin_response, notify_email_freq, font_size, theme")
     .eq("id", user.id)
     .single();
   if (!profile) redirect("/onboarding");
@@ -260,14 +260,12 @@ export default async function SettingsPage({
       <section className="rounded-2xl border border-wabi bg-white/70 p-5">
         <h2 className="text-sm font-semibold text-ink">アクセシビリティ</h2>
         <p className="mt-1 text-xs text-sumi/70">
-          見やすさ・使いやすさを調整できます。
+          見やすさを調整できます。
         </p>
         <div className="mt-4">
           <AccessibilityForm
             initial={{
               font_size: profile.font_size,
-              reduce_motion: profile.reduce_motion,
-              high_contrast: profile.high_contrast,
               theme: profile.theme,
             }}
           />

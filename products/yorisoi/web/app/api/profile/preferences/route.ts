@@ -10,8 +10,6 @@ const Body = z.object({
   notify_email_freq: z.enum(["realtime", "daily", "weekly", "never"]).optional(),
   // アクセシビリティ
   font_size: z.enum(["small", "medium", "large"]).optional(),
-  reduce_motion: z.boolean().optional(),
-  high_contrast: z.boolean().optional(),
   theme: z.enum(["light", "dark"]).optional(),
 });
 
