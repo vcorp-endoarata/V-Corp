@@ -42,14 +42,14 @@ export function BookmarkButton({
         aria-label={active ? "ブックマーク解除" : "ブックマーク"}
         title={active ? "ブックマーク解除" : "ブックマーク"}
         aria-pressed={active}
-        className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs transition disabled:opacity-50 ${
+        className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs whitespace-nowrap transition disabled:opacity-50 ${
           active
             ? "bg-sage text-cream"
             : "text-sumi/60 hover:bg-sage/10 hover:text-sage"
         }`}
       >
         <span aria-hidden>{active ? "🔖" : "📑"}</span>
-        <span>{active ? "保存中" : "保存"}</span>
+        <span className="hidden sm:inline">{active ? "保存中" : "保存"}</span>
       </button>
       {flash && (
         <span

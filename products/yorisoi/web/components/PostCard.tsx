@@ -136,11 +136,16 @@ export function PostCard({
           {!hideReplyLink && (
             <Link
               href={`/post/${post.id}`}
-              className="flex items-center gap-1 rounded-full px-3 py-1.5 text-xs text-sumi/60 transition hover:bg-sage/10 hover:text-sage"
+              className="flex items-center gap-1 rounded-full px-3 py-1.5 text-xs text-sumi/60 whitespace-nowrap transition hover:bg-sage/10 hover:text-sage"
               aria-label={`返信を見る (${replyCount}件)`}
             >
               <span aria-hidden>💬</span>
-              <span>{replyCount > 0 ? `返信 ${replyCount}` : "返信する"}</span>
+              <span className="hidden sm:inline">
+                {replyCount > 0 ? `返信 ${replyCount}` : "返信する"}
+              </span>
+              {replyCount > 0 && (
+                <span className="text-xs tabular-nums sm:hidden">{replyCount}</span>
+              )}
             </Link>
           )}
           <ShareButton
