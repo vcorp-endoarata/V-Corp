@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ReportButton } from "@/components/ReportButton";
+import { PostMediaDisplay } from "@/components/PostMediaDisplay";
 
 const ROLE_LABEL: Record<string, string> = {
   self: "当事者",
@@ -35,6 +36,13 @@ type ReplyCardProps = {
       role: string;
       show_role?: boolean;
     };
+    media?: {
+      id: string;
+      kind: "image" | "video";
+      storage_path: string;
+      width?: number | null;
+      height?: number | null;
+    }[];
   };
   isOwn: boolean;
 };
@@ -75,6 +83,10 @@ export function ReplyCard({ reply, isOwn }: ReplyCardProps) {
       <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-ink">
         {reply.body}
       </p>
+
+      {reply.media && reply.media.length > 0 && (
+        <PostMediaDisplay media={reply.media} />
+      )}
 
       <footer className="mt-3 flex items-center justify-end gap-2">
         {isOwn ? (

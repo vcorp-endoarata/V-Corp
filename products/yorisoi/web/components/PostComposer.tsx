@@ -41,6 +41,15 @@ export function PostComposer({
   const noContent = body.trim().length === 0 && !hasMedia;
   const trialPostBlock = trial?.isTrial && trial.postsRemaining <= 0;
   const trialMediaBlock = trial?.isTrial && !trial.mediaAllowed;
+  const hasContent = body.length > 0 || hasMedia;
+
+  function reset() {
+    if (hasContent && !confirm("入力中の内容を取り消しますか?")) return;
+    setBody("");
+    setFiles([]);
+    setConsentConfirmed(false);
+    setError(null);
+  }
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -156,6 +165,16 @@ export function PostComposer({
 
         <div className="flex items-center gap-3">
           <span className="text-xs text-sumi/50">{body.length} / 500</span>
+          {hasContent && (
+            <button
+              type="button"
+              onClick={reset}
+              disabled={isPending}
+              className="rounded-full border border-wabi bg-white px-4 py-1.5 text-sm text-sumi hover:bg-sage/5 disabled:opacity-40"
+            >
+              取り消す
+            </button>
+          )}
           <button
             type="submit"
             disabled={noContent || consentMissing || trialPostBlock || isPending}
