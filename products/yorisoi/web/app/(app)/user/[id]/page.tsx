@@ -63,7 +63,6 @@ export default async function PublicProfilePage({
   const blocked = (relations ?? []).some((r) => r.kind === "block");
   const muted = (relations ?? []).some((r) => r.kind === "mute");
 
-  // ピン留めされた投稿 (本人公開・published のみ)
   type PinPost = { id: string };
   let pinnedPost: PinPost | null = null;
   if (target.pinned_post_id) {
@@ -73,7 +72,7 @@ export default async function PublicProfilePage({
         `
         id, body, category, space, empathy_count, reply_count, created_at, status,
         author:profiles!posts_author_id_fkey(id, nickname, role, show_role, avatar_url),
-        media:post_media(id, kind, storage_path, width, height, blurred)
+        media:post_media(id, kind, storage_path, width, height)
       `,
       )
       .eq("id", target.pinned_post_id)
@@ -88,7 +87,7 @@ export default async function PublicProfilePage({
       `
       id, body, category, space, empathy_count, reply_count, created_at,
       author:profiles!posts_author_id_fkey(id, nickname, role, show_role, avatar_url),
-      media:post_media(id, kind, storage_path, width, height, blurred)
+      media:post_media(id, kind, storage_path, width, height)
     `,
     )
     .eq("author_id", id)
@@ -96,7 +95,6 @@ export default async function PublicProfilePage({
     .order("created_at", { ascending: false })
     .limit(30);
 
-  // ピン留め投稿は通常一覧から除外 (重複防止)
   const otherPosts = (posts ?? []).filter(
     (p) => (p as { id: string }).id !== target.pinned_post_id,
   );
