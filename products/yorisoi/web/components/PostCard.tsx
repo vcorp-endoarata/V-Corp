@@ -45,7 +45,6 @@ type PostCardProps = {
       storage_path: string;
       width?: number | null;
       height?: number | null;
-      blurred?: boolean | null;
     }[];
   };
   hasEmpathy: boolean;
@@ -54,9 +53,7 @@ type PostCardProps = {
   isPinned?: boolean;
   showPinControl?: boolean;
   pinnedBadge?: boolean;
-  /** 詳細ページ表示時など返信リンクを出さない時 */
   hideReplyLink?: boolean;
-  /** 閲覧者が運営者か (削除フローの分岐に使う) */
   isAdmin?: boolean;
 };
 

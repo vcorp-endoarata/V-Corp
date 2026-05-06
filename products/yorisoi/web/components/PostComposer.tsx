@@ -31,12 +31,10 @@ export function PostComposer({
   const [isPending, startTransition] = useTransition();
   const [body, setBody] = useState("");
   const [category, setCategory] = useState<typeof CATEGORIES[number]["value"]>("diary");
-  // space は表示中のスペース (上部の SpaceSwitcher) と一致させる。投稿時に切り替える必要は無い。
   const space = defaultSpace;
   const [error, setError] = useState<string | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [consentConfirmed, setConsentConfirmed] = useState(false);
-  const [blurMinors, setBlurMinors] = useState(false);
 
   const hasMedia = files.length > 0;
   const consentMissing = hasMedia && !consentConfirmed;
@@ -81,7 +79,6 @@ export function PostComposer({
                 width: meta.width ?? null,
                 height: meta.height ?? null,
                 bytes: meta.bytes,
-                blurred: blurMinors,
                 consent_confirmed: true,
               });
             if (insertError) throw insertError;
@@ -91,7 +88,6 @@ export function PostComposer({
         setBody("");
         setFiles([]);
         setConsentConfirmed(false);
-        setBlurMinors(false);
         router.refresh();
       } catch (err) {
         setError(err instanceof Error ? err.message : "エラーが起きました");
@@ -137,19 +133,6 @@ export function PostComposer({
               <strong className="text-ink">写っている人全員の同意を得ました</strong>
               <br />
               本人の同意がない投稿は削除・通報の対象になります。
-            </span>
-          </label>
-
-          <label className="flex items-start gap-2 text-xs text-sumi">
-            <input
-              type="checkbox"
-              checked={blurMinors}
-              onChange={(e) => setBlurMinors(e.target.checked)}
-              className="mt-0.5 accent-sage"
-            />
-            <span>
-              未成年が写っているので <strong>ぼかし表示</strong> にする
-              <span className="text-sumi/60"> (推奨)</span>
             </span>
           </label>
         </div>

@@ -35,7 +35,6 @@ type TagRow = {
       storage_path: string;
       width: number | null;
       height: number | null;
-      blurred: boolean | null;
     }[];
   } | null;
 };
@@ -58,7 +57,7 @@ export default async function TagPage({ params }: Props) {
       post:posts!post_tags_post_id_fkey(
         id, body, category, space, empathy_count, reply_count, created_at, status,
         author:profiles!posts_author_id_fkey(id, nickname, role, show_role, avatar_url),
-        media:post_media(id, kind, storage_path, width, height, blurred)
+        media:post_media(id, kind, storage_path, width, height)
       )
     `,
     )

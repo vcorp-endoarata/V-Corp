@@ -1,12 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-/**
- * 投稿の本文検索 (シンプル版)。
- * Postgres ILIKE で部分一致。RLS で空間アクセス制御は自動適用される。
- *
- * GET /api/search?q=キーワード&limit=30
- */
 export async function GET(req: Request) {
   const supabase = await createClient();
   const {
@@ -33,7 +27,6 @@ export async function GET(req: Request) {
     );
   }
 
-  // 特殊文字のエスケープ (LIKE 用)
   const escaped = q.replace(/([%_\\])/g, "\\$1");
 
   const { data: posts, error } = await supabase
@@ -42,7 +35,7 @@ export async function GET(req: Request) {
       `
       id, body, category, space, empathy_count, reply_count, created_at,
       author:profiles!posts_author_id_fkey(id, nickname, role, show_role),
-      media:post_media(id, kind, storage_path, width, height, blurred)
+      media:post_media(id, kind, storage_path, width, height)
     `,
     )
     .eq("status", "published")
