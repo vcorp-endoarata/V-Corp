@@ -80,7 +80,8 @@ export default async function PostDetailPage({
     .select(
       `
       id, body, status, created_at, author_id,
-      author:profiles!replies_author_id_fkey(id, nickname, role, show_role)
+      author:profiles!replies_author_id_fkey(id, nickname, role, show_role),
+      media:post_media!post_media_reply_id_fkey(id, kind, storage_path, width, height)
     `,
     )
     .eq("post_id", id)

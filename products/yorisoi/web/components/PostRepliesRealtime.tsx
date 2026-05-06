@@ -15,16 +15,15 @@ type Reply = {
     role: string;
     show_role?: boolean;
   };
+  media?: {
+    id: string;
+    kind: "image" | "video";
+    storage_path: string;
+    width?: number | null;
+    height?: number | null;
+  }[];
 };
 
-/**
- * 投稿詳細の返信リストを Supabase Realtime で自動更新する Client Component。
- *
- * - INSERT: 新着返信を末尾に append (古い順なので末尾が新しい)
- * - UPDATE: status != published になったら除去
- *
- * 自分の返信は ReplyComposer 経由で router.refresh() されるためここでは扱わない。
- */
 export function PostRepliesRealtime({
   postId,
   initialReplies,
@@ -66,7 +65,8 @@ export function PostRepliesRealtime({
             .select(
               `
               id, body, created_at, author_id,
-              author:profiles!replies_author_id_fkey(id, nickname, role, show_role)
+              author:profiles!replies_author_id_fkey(id, nickname, role, show_role),
+              media:post_media!post_media_reply_id_fkey(id, kind, storage_path, width, height)
             `,
             )
             .eq("id", np.id)
