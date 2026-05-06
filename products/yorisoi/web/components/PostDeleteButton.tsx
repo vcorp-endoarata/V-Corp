@@ -68,9 +68,10 @@ export function PostDeleteButton({
         onClick={() => setConfirming(true)}
         title="この投稿を削除"
         aria-label="この投稿を削除"
-        className="rounded-full px-3 py-1.5 text-xs text-sumi/60 hover:bg-red-50 hover:text-red-600"
+        className="flex items-center gap-1 rounded-full px-3 py-1.5 text-xs text-sumi/60 whitespace-nowrap hover:bg-red-50 hover:text-red-600"
       >
-        🗑 削除
+        <span aria-hidden>🗑</span>
+        <span className="hidden sm:inline">削除</span>
       </button>
     );
   }

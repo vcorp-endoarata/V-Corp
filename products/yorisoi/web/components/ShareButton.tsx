@@ -39,10 +39,10 @@ export function ShareButton({
       onClick={onClick}
       title="共有"
       aria-label="共有"
-      className="flex items-center gap-2 rounded-full px-4 py-1.5 text-sm text-sumi transition hover:bg-sage/10 hover:text-sage"
+      className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm text-sumi whitespace-nowrap transition hover:bg-sage/10 hover:text-sage"
     >
       <span aria-hidden>↗</span>
-      <span>{copied ? "コピー済" : "共有"}</span>
+      <span className="hidden sm:inline">{copied ? "コピー済" : "共有"}</span>
     </button>
   );
 }
