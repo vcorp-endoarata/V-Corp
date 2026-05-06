@@ -58,7 +58,7 @@ export function UnazukiButton({
         } ${disabled ? "opacity-40 cursor-not-allowed" : ""}`}
       >
         <span aria-hidden className={active ? "scale-110" : ""}>
-          {active ? "💚" : "🤍"}
+          {active ? "💚" : "🫶"}
         </span>
         {count > 0 && (
           <span
