@@ -30,7 +30,7 @@ export function PostComposer({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [body, setBody] = useState("");
-  const [category, setCategory] = useState<typeof CATEGORIES[number]["value"]>("diary");
+  const [category, setCategory] = useState<typeof CATEGORIES[number]["value"] | "">("");
   const space = defaultSpace;
   const [error, setError] = useState<string | null>(null);
   const [files, setFiles] = useState<File[]>([]);
@@ -39,21 +39,23 @@ export function PostComposer({
   const hasMedia = files.length > 0;
   const consentMissing = hasMedia && !consentConfirmed;
   const noContent = body.trim().length === 0 && !hasMedia;
+  const categoryMissing = category === "";
   const trialPostBlock = trial?.isTrial && trial.postsRemaining <= 0;
   const trialMediaBlock = trial?.isTrial && !trial.mediaAllowed;
-  const hasContent = body.length > 0 || hasMedia;
+  const hasContent = body.length > 0 || hasMedia || category !== "";
 
   function reset() {
     if (hasContent && !confirm("入力中の内容を取り消しますか?")) return;
     setBody("");
     setFiles([]);
     setConsentConfirmed(false);
+    setCategory("");
     setError(null);
   }
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (noContent || consentMissing) return;
+    if (noContent || consentMissing || categoryMissing) return;
 
     startTransition(async () => {
       setError(null);
@@ -97,6 +99,7 @@ export function PostComposer({
         setBody("");
         setFiles([]);
         setConsentConfirmed(false);
+        setCategory("");
         router.refresh();
       } catch (err) {
         setError(err instanceof Error ? err.message : "エラーが起きました");
@@ -152,9 +155,15 @@ export function PostComposer({
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value as typeof category)}
-            className="rounded-full border border-wabi bg-white px-3 py-1 text-xs text-sumi outline-none focus:border-sage"
+            required
+            className={`rounded-full border bg-white px-3 py-1 text-xs outline-none focus:border-sage ${
+              categoryMissing
+                ? "border-sakura/60 text-sakura"
+                : "border-wabi text-sumi"
+            }`}
             aria-label="カテゴリー"
           >
+            <option value="">カテゴリーを選択</option>
             {CATEGORIES.map((c) => (
               <option key={c.value} value={c.value}>
                 {c.label}
@@ -177,13 +186,21 @@ export function PostComposer({
           )}
           <button
             type="submit"
-            disabled={noContent || consentMissing || trialPostBlock || isPending}
+            disabled={
+              noContent ||
+              consentMissing ||
+              categoryMissing ||
+              trialPostBlock ||
+              isPending
+            }
             title={
               trialPostBlock
                 ? "新規アカウントは 24 時間で 5 投稿までです"
-                : consentMissing
-                  ? "写真・動画を投稿するには同意確認が必要です"
-                  : undefined
+                : categoryMissing
+                  ? "カテゴリーを選択してください"
+                  : consentMissing
+                    ? "写真・動画を投稿するには同意確認が必要です"
+                    : undefined
             }
             className="rounded-full bg-sage px-5 py-1.5 text-sm font-semibold text-cream transition hover:opacity-90 disabled:opacity-40"
           >
