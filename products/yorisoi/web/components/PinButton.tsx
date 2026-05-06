@@ -47,14 +47,13 @@ export function PinButton({
         aria-pressed={pinned}
         aria-label={pinned ? "ピン留めを解除" : "プロフィールにピン留め"}
         title={pinned ? "ピン留めを解除" : "プロフィールにピン留め"}
-        className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs whitespace-nowrap transition disabled:opacity-50 ${
+        className={`flex items-center rounded-full px-3 py-1.5 text-base whitespace-nowrap transition disabled:opacity-50 ${
           pinned
-            ? "bg-sage text-cream"
-            : "text-sumi/60 hover:bg-sage/10 hover:text-sage"
+            ? "bg-sage/15 text-sage"
+            : "text-sumi/70 hover:bg-sage/10 hover:text-sage"
         }`}
       >
         <span aria-hidden>📌</span>
-        <span className="hidden sm:inline">{pinned ? "ピン留め中" : "ピン留め"}</span>
       </button>
       {flash && (
         <span

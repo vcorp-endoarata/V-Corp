@@ -72,14 +72,24 @@ export default async function TagPage({ params }: Props) {
       (p): p is NonNullable<typeof p> => p !== null && p.status === "published",
     );
 
-  const [{ data: myEmpathy }, { data: myBookmarks }, { hiddenAuthors }] =
-    await Promise.all([
-      supabase.from("empathy").select("post_id").eq("user_id", user.id),
-      supabase.from("bookmarks").select("post_id").eq("user_id", user.id),
-      getRelationFilters(user.id),
-    ]);
+  const [
+    { data: myEmpathy },
+    { data: myBookmarks },
+    { hiddenAuthors },
+    { data: profile },
+  ] = await Promise.all([
+    supabase.from("empathy").select("post_id").eq("user_id", user.id),
+    supabase.from("bookmarks").select("post_id").eq("user_id", user.id),
+    getRelationFilters(user.id),
+    supabase
+      .from("profiles")
+      .select("is_admin")
+      .eq("id", user.id)
+      .maybeSingle(),
+  ]);
   const empathySet = new Set((myEmpathy ?? []).map((e) => e.post_id));
   const bookmarkSet = new Set((myBookmarks ?? []).map((b) => b.post_id));
+  const isAdmin = profile?.is_admin === true;
 
   const filtered = posts.filter((p) => !hiddenAuthors.has(p.author?.id));
 
@@ -104,6 +114,7 @@ export default async function TagPage({ params }: Props) {
               hasEmpathy={empathySet.has(p.id)}
               hasBookmark={bookmarkSet.has(p.id)}
               isOwn={p.author?.id === user.id}
+              isAdmin={isAdmin}
             />
           ))}
         </section>

@@ -25,7 +25,7 @@ export default async function PostDetailPage({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id")
+    .select("id, is_admin")
     .eq("id", user.id)
     .single();
   if (!profile) redirect("/onboarding");
@@ -104,6 +104,7 @@ export default async function PostDetailPage({
         isOwn={isOwnPost}
         isPinned={isPinned}
         showPinControl={isOwnPost}
+        isAdmin={profile.is_admin === true}
         hideReplyLink
       />
 

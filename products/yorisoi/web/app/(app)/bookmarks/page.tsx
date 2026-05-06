@@ -60,11 +60,16 @@ export default async function BookmarksPage() {
       (p): p is NonNullable<typeof p> => p !== null && p.status === "published",
     );
 
-  const { data: myEmpathy } = await supabase
-    .from("empathy")
-    .select("post_id")
-    .eq("user_id", user.id);
+  const [{ data: myEmpathy }, { data: profile }] = await Promise.all([
+    supabase.from("empathy").select("post_id").eq("user_id", user.id),
+    supabase
+      .from("profiles")
+      .select("is_admin")
+      .eq("id", user.id)
+      .maybeSingle(),
+  ]);
   const empathySet = new Set((myEmpathy ?? []).map((e) => e.post_id));
+  const isAdmin = profile?.is_admin === true;
 
   return (
     <div className="space-y-6">
@@ -87,6 +92,7 @@ export default async function BookmarksPage() {
               hasEmpathy={empathySet.has(p.id)}
               hasBookmark={true}
               isOwn={p.author?.id === user.id}
+              isAdmin={isAdmin}
             />
           ))}
         </section>

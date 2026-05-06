@@ -7,10 +7,10 @@ type Mode = "immediate" | "requested" | "requested_already";
 
 export function PostDeleteButton({
   postId,
-  hasReplies,
+  isAdmin = false,
 }: {
   postId: string;
-  hasReplies: boolean;
+  isAdmin?: boolean;
 }) {
   const router = useRouter();
   const [confirming, setConfirming] = useState(false);
@@ -66,22 +66,21 @@ export function PostDeleteButton({
       <button
         type="button"
         onClick={() => setConfirming(true)}
-        title="この投稿を削除"
-        aria-label="この投稿を削除"
-        className="flex items-center gap-1 rounded-full px-3 py-1.5 text-xs text-sumi/60 whitespace-nowrap hover:bg-red-50 hover:text-red-600"
+        title={isAdmin ? "この投稿を削除" : "この投稿の削除を申請"}
+        aria-label={isAdmin ? "この投稿を削除" : "この投稿の削除を申請"}
+        className="flex items-center rounded-full px-3 py-1.5 text-base text-sumi/70 whitespace-nowrap hover:bg-red-50 hover:text-red-600"
       >
         <span aria-hidden>🗑</span>
-        <span className="hidden sm:inline">削除</span>
       </button>
     );
   }
 
   return (
-    <span className="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50/40 px-3 py-1.5 text-xs">
+    <span className="inline-flex flex-wrap items-center gap-2 rounded-xl border border-red-200 bg-red-50/40 px-3 py-1.5 text-xs">
       <span className="text-sumi">
-        {hasReplies
-          ? "返信があるため運営審査になります。よろしいですか?"
-          : "本当に削除しますか?"}
+        {isAdmin
+          ? "本当に削除しますか?"
+          : "削除を申請します。運営者の確認後に削除されます。よろしいですか?"}
       </span>
       <button
         type="button"
@@ -89,7 +88,7 @@ export function PostDeleteButton({
         disabled={isPending}
         className="rounded-full bg-red-600 px-3 py-0.5 font-semibold text-white hover:bg-red-700 disabled:opacity-50"
       >
-        {isPending ? "処理中…" : hasReplies ? "申請する" : "削除"}
+        {isPending ? "処理中…" : isAdmin ? "削除" : "申請する"}
       </button>
       <button
         type="button"

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { UnazukiButton } from "@/components/UnazukiButton";
-import { ShareButton } from "@/components/ShareButton";
 import { ReportButton } from "@/components/ReportButton";
 import { BookmarkButton } from "@/components/BookmarkButton";
 import { PinButton } from "@/components/PinButton";
@@ -57,6 +56,8 @@ type PostCardProps = {
   pinnedBadge?: boolean;
   /** 詳細ページ表示時など返信リンクを出さない時 */
   hideReplyLink?: boolean;
+  /** 閲覧者が運営者か (削除フローの分岐に使う) */
+  isAdmin?: boolean;
 };
 
 function timeAgo(iso: string): string {
@@ -81,6 +82,7 @@ export function PostCard({
   showPinControl = false,
   pinnedBadge = false,
   hideReplyLink = false,
+  isAdmin = false,
 }: PostCardProps) {
   const replyCount = post.reply_count ?? 0;
 
@@ -136,22 +138,18 @@ export function PostCard({
           {!hideReplyLink && (
             <Link
               href={`/post/${post.id}`}
-              className="flex items-center gap-1 rounded-full px-3 py-1.5 text-xs text-sumi/60 whitespace-nowrap transition hover:bg-sage/10 hover:text-sage"
+              className="flex items-center gap-1 rounded-full px-3 py-1.5 text-base text-sumi/70 whitespace-nowrap transition hover:bg-sage/10 hover:text-sage"
               aria-label={`返信を見る (${replyCount}件)`}
+              title={replyCount > 0 ? `返信 ${replyCount}件` : "返信する"}
             >
               <span aria-hidden>💬</span>
-              <span className="hidden sm:inline">
-                {replyCount > 0 ? `返信 ${replyCount}` : "返信する"}
-              </span>
               {replyCount > 0 && (
-                <span className="text-xs tabular-nums sm:hidden">{replyCount}</span>
+                <span className="rounded-full bg-sage/15 px-1.5 py-0.5 text-[11px] font-bold text-sage tabular-nums">
+                  {replyCount}
+                </span>
               )}
             </Link>
           )}
-          <ShareButton
-            text={post.body.slice(0, 80) + (post.body.length > 80 ? "…" : "")}
-            url={`https://yorisoi.community/post/${post.id}`}
-          />
           <BookmarkButton postId={post.id} initialActive={hasBookmark} />
           {showPinControl && isOwn && (
             <PinButton postId={post.id} initialPinned={isPinned} />
@@ -159,10 +157,7 @@ export function PostCard({
         </div>
         <div className="flex items-center gap-1">
           {isOwn && (
-            <PostDeleteButton
-              postId={post.id}
-              hasReplies={(post.reply_count ?? 0) > 0}
-            />
+            <PostDeleteButton postId={post.id} isAdmin={isAdmin} />
           )}
           <ReportButton targetType="post" targetId={post.id} disabled={isOwn} />
         </div>
