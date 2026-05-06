@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { getPublicUrl } from "@/lib/storage";
 
 type Media = {
@@ -9,7 +8,6 @@ type Media = {
   storage_path: string;
   width?: number | null;
   height?: number | null;
-  blurred?: boolean | null;
 };
 
 export function PostMediaDisplay({ media }: { media: Media[] }) {
@@ -32,7 +30,6 @@ export function PostMediaDisplay({ media }: { media: Media[] }) {
 }
 
 function MediaItem({ m, cover }: { m: Media; cover: boolean }) {
-  const [revealed, setRevealed] = useState(!m.blurred);
   const url = getPublicUrl(m.storage_path);
 
   const aspectClass = cover ? "aspect-square" : "max-h-[600px]";
@@ -41,18 +38,14 @@ function MediaItem({ m, cover }: { m: Media; cover: boolean }) {
     : "h-auto max-h-[600px] w-full object-contain";
 
   return (
-    <figure
-      className={`relative overflow-hidden bg-cream ${aspectClass}`}
-    >
+    <figure className={`relative overflow-hidden bg-cream ${aspectClass}`}>
       {m.kind === "image" ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={url}
           alt=""
           loading="lazy"
-          className={`${imgClass} ${
-            revealed ? "" : "scale-110 blur-2xl"
-          } transition`}
+          className={imgClass}
           width={m.width ?? undefined}
           height={m.height ?? undefined}
         />
@@ -62,20 +55,8 @@ function MediaItem({ m, cover }: { m: Media; cover: boolean }) {
           controls
           playsInline
           preload="metadata"
-          className={`${imgClass} ${revealed ? "" : "scale-110 blur-2xl"}`}
+          className={imgClass}
         />
-      )}
-
-      {!revealed && (
-        <button
-          type="button"
-          onClick={() => setRevealed(true)}
-          className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 text-cream"
-          aria-label="ぼかしを解除して表示する"
-        >
-          <span aria-hidden className="text-2xl">👁</span>
-          <span className="mt-1 text-xs">タップして表示</span>
-        </button>
       )}
     </figure>
   );
