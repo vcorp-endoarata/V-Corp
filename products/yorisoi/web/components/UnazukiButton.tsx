@@ -51,17 +51,22 @@ export function UnazukiButton({
               : "うなずく"
         }
         aria-pressed={active}
-        className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm whitespace-nowrap transition ${
+        className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-base whitespace-nowrap transition ${
           active
-            ? "bg-sage text-cream"
-            : "text-sumi hover:bg-sage/10 hover:text-sage"
+            ? "bg-sage/15 text-sage"
+            : "text-sumi/70 hover:bg-sage/10 hover:text-sage"
         } ${disabled ? "opacity-40 cursor-not-allowed" : ""}`}
       >
         <span aria-hidden className={active ? "scale-110" : ""}>
-          {active ? "🌿" : "🍃"}
+          {active ? "💚" : "🤍"}
         </span>
-        <span className="hidden sm:inline">{active ? "うなずき中" : "うなずく"}</span>
-        {count > 0 && <span className="text-xs tabular-nums">{count}</span>}
+        {count > 0 && (
+          <span
+            className={`text-xs font-semibold tabular-nums ${active ? "text-sage" : "text-sumi/70"}`}
+          >
+            {count}
+          </span>
+        )}
       </button>
       {flash && (
         <span

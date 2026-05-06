@@ -46,7 +46,7 @@ export default async function FeedPage({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, nickname, role, created_at")
+    .select("id, nickname, role, created_at, is_admin")
     .eq("id", user.id)
     .single();
   if (!profile) redirect("/onboarding");
@@ -135,6 +135,7 @@ export default async function FeedPage({
         space={space}
         category={category}
         currentUserId={user.id}
+        isAdmin={profile.is_admin === true}
         emptyMessage={
           category
             ? "このカテゴリーの投稿はまだありません。\n最初のひとことを、書いてみませんか?"

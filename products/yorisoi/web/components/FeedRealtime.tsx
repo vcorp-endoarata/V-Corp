@@ -29,15 +29,6 @@ type FeedPost = {
   }[];
 };
 
-/**
- * フィードの投稿リストを Supabase Realtime で自動更新する Client Component。
- *
- * - INSERT: 新着投稿を先頭に prepend (自分の投稿 / block・mute / category 不一致は除外)
- * - UPDATE: empathy_count / reply_count をその場で更新。status != published になったら除去
- * - DELETE: リストから除去
- *
- * 自分の投稿は PostComposer 経由で router.refresh() されるためここでは扱わない。
- */
 export function FeedRealtime({
   initialPosts,
   initialEmpathySet,
@@ -47,6 +38,7 @@ export function FeedRealtime({
   category,
   currentUserId,
   emptyMessage,
+  isAdmin = false,
 }: {
   initialPosts: FeedPost[];
   initialEmpathySet: string[];
@@ -56,13 +48,13 @@ export function FeedRealtime({
   category?: string;
   currentUserId: string;
   emptyMessage: string;
+  isAdmin?: boolean;
 }) {
   const [posts, setPosts] = useState<FeedPost[]>(initialPosts);
   const empathySet = new Set(initialEmpathySet);
   const bookmarkSet = new Set(initialBookmarkSet);
   const hiddenSet = useRef(new Set(hiddenAuthorIds));
 
-  // server からの再 fetch (router.refresh等) で props 更新時はそれを採用
   useEffect(() => {
     setPosts(initialPosts);
   }, [initialPosts]);
@@ -95,7 +87,6 @@ export function FeedRealtime({
           if (hiddenSet.current.has(np.author_id)) return;
           if (category && np.category !== category) return;
 
-          // 完全な行 (author + media) を取得
           const { data } = await supabase
             .from("posts")
             .select(
@@ -186,6 +177,7 @@ export function FeedRealtime({
           hasEmpathy={empathySet.has(p.id)}
           hasBookmark={bookmarkSet.has(p.id)}
           isOwn={p.author?.id === currentUserId}
+          isAdmin={isAdmin}
         />
       ))}
     </section>

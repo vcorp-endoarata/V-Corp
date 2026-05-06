@@ -21,12 +21,11 @@ export function ReportButton({
         disabled={disabled}
         title={disabled ? "自分の投稿は通報できません" : "通報する"}
         aria-label="通報"
-        className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs text-sumi/60 whitespace-nowrap transition hover:bg-red-50 hover:text-red-600 ${
+        className={`flex items-center rounded-full px-3 py-1.5 text-base whitespace-nowrap text-sumi/70 transition hover:bg-red-50 hover:text-red-600 ${
           disabled ? "opacity-30 cursor-not-allowed" : ""
         }`}
       >
-        <span aria-hidden>⚠</span>
-        <span className="hidden sm:inline">通報</span>
+        <span aria-hidden>🚩</span>
       </button>
       {open && (
         <ReportModal

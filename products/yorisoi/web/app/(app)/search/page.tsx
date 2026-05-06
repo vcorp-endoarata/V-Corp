@@ -23,12 +23,19 @@ export default async function SearchPage({
   const q = (params.q ?? "").trim();
   const escaped = q.replace(/([%_\\])/g, "\\$1");
 
-  const [{ data: myEmpathy }, { data: myBookmarks }] = await Promise.all([
-    supabase.from("empathy").select("post_id").eq("user_id", user.id),
-    supabase.from("bookmarks").select("post_id").eq("user_id", user.id),
-  ]);
+  const [{ data: myEmpathy }, { data: myBookmarks }, { data: profile }] =
+    await Promise.all([
+      supabase.from("empathy").select("post_id").eq("user_id", user.id),
+      supabase.from("bookmarks").select("post_id").eq("user_id", user.id),
+      supabase
+        .from("profiles")
+        .select("is_admin")
+        .eq("id", user.id)
+        .maybeSingle(),
+    ]);
   const empathySet = new Set((myEmpathy ?? []).map((e) => e.post_id));
   const bookmarkSet = new Set((myBookmarks ?? []).map((b) => b.post_id));
+  const isAdmin = profile?.is_admin === true;
 
   const { data: posts } = q
     ? await supabase
@@ -70,6 +77,7 @@ export default async function SearchPage({
                 hasEmpathy={empathySet.has(p.id)}
                 hasBookmark={bookmarkSet.has(p.id)}
                 isOwn={author?.id === user.id}
+                isAdmin={isAdmin}
               />
             );
           })}
